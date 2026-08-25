@@ -1,7 +1,66 @@
 {
-    "users": [
-        {"id": "1", "email": "admin@test.com", "password": "123", "role": "admin", "name": "Admin User"},
-        {"id": "2", "email": "user@test.com", "password": "123", "role": "user", "name": "Normal User"}
-    ],
-    "submissions": []
+  "users": [
+    {
+      "id": "1",
+      "username": "admin",
+      "email": "admin@test.com",
+      "password": "123",
+      "role": "admin",
+      "name": "Admin User"
+    },
+    {
+      "id": "2",
+      "email": "user@test.com",
+      "password": "123",
+      "role": "user",
+      "name": "Normal User"
+    },
+    {
+      "username": "Deepti",
+      "password": "deepti123",
+      "role": "user",
+      "id": "6JgKJ1sAmy8"
+    },
+    {
+      "username": "Ishan",
+      "password": "ishan123",
+      "role": "admin",
+      "id": "T9f5wjhy7_I"
+    },
+    {
+      "username": "Aarav",
+      "password": "aarav123",
+      "role": "user",
+      "id": "o3JkcHL_R-8"
+    }
+  ],
+  "submissions": [
+    {
+      "fullName": "DEEPTI BHAT",
+      "email": "deeptibhat2001@gmail.com",
+      "phone": "8082897174",
+      "department": "Computer",
+      "designation": "Developer",
+      "address": "Gurugram",
+      "description": "Excellent",
+      "dateOfSubmission": "2026-08-25",
+      "userId": "6JgKJ1sAmy8",
+      "username": "Deepti",
+      "id": "0t4s450ZMcs"
+    },
+    {
+      "fullName": "Aarav",
+      "email": "aarav123@gmail.com",
+      "phone": "9876541230",
+      "department": "Non-Technical",
+      "designation": "Team Lead",
+      "address": "Mumbai",
+      "description": "Nothing ",
+      "dateOfSubmission": "2026-08-25",
+      "userId": "o3JkcHL_R-8",
+      "username": "Aarav",
+      "id": "FRVGz0xYhRA"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }
