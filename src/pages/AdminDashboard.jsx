@@ -132,7 +132,7 @@ export default function AdminDashboard() {
                         {sub.designation}
                       </div>
                     </td>
-                    <td className="py-3 px-2 text-xs text-[#7a5a8c] max-w-[150px] truncate">
+                    <td className="py-3 px-2 text-xs text-[#7a5a8c] max-w-37.5 truncate">
                       {sub.description || "No remarks"}
                     </td>
                     <td className="py-3 px-2 text-xs text-[#7a5a8c]">
@@ -140,7 +140,16 @@ export default function AdminDashboard() {
                         ? sub.dateOfSubmission.split("-").reverse().join("/")
                         : "N/A"}
                     </td>
-                    <td className="py-3 px-2 text-right">
+                    <td className="py-3 px-2 text-right space-x-2 whitespace-nowrap">
+                      <button
+                        onClick={() =>
+                          navigate(`/admin/form-details/${sub.id}`)
+                        }
+                        className="px-3 py-1 bg-blue-50 text-blue-600 rounded-xl text-xs font-bold hover:bg-blue-100 transition"
+                      >
+                        View
+                      </button>
+
                       <button
                         onClick={() => handleDelete(sub.id)}
                         className="px-3 py-1 bg-red-50 text-red-600 rounded-xl text-xs font-bold hover:bg-red-100 transition"

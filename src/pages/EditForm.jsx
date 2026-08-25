@@ -4,7 +4,7 @@ import { getSubmissions, updateSubmission } from '../services/api';
 
 export default function EditForm() {
   const navigate = useNavigate();
-  const { id } = useParams(); // Grabs the ID from the URL path (/edit-form/:id)
+  const { id } = useParams(); 
   const currentUser = JSON.parse(localStorage.getItem('user'));
 
   const [formData, setFormData] = useState({
@@ -17,7 +17,7 @@ export default function EditForm() {
     description: '',
     dateOfSubmission: ''
   });
-  const [error, setError] = useState('');
+//   const [error, setError] = useState('');
 
   useEffect(() => {
     fetchSubmissionData();
@@ -39,10 +39,10 @@ export default function EditForm() {
           dateOfSubmission: currentSub.dateOfSubmission || ''
         });
       } else {
-        setError('Submission not found.');
+        alert('Submission not found.');
       }
     } catch (err) {
-      setError('Failed to load submission details.');
+      alert('Failed to load submission details.');
     }
   };
 
@@ -52,11 +52,24 @@ export default function EditForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+  
 
-    if (!formData.fullName || !formData.department || !formData.email) {
-      setError('Please fill in all required fields.');
+    if (!formData.fullName || !formData.department || !formData.email || !formData.phone || !formData.designation || !formData.address || !formData.dateOfSubmission) {
+      alert('Please fill in all required fields.');
       return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      alert('Please enter a valid email address.');
+      return;
+    }
+    if (formData.phone) {
+      const phoneRegex = /^\d{10}$/;
+      if (!phoneRegex.test(formData.phone)) {
+        alert('Please enter a valid phone number (must be exactly 10 digits)');
+        return;
+      }
     }
 
     try {
@@ -68,7 +81,7 @@ export default function EditForm() {
       await updateSubmission(id, updatedRecord);
       navigate('/user-dashboard'); 
     } catch (err) {
-      setError('Failed to update submission. Please try again.');
+      alert('Failed to update submission. Please try again.');
     }
   };
 
@@ -81,13 +94,13 @@ export default function EditForm() {
             onClick={() => navigate('/user-dashboard')}
             className="text-xs font-bold text-[#7a5a8c] hover:text-[#2a1a33]"
           >
-            ← Back to Dashboard
+            Back to Dashboard
           </button>
         </div>
 
-        {error && <div className="mb-4 p-3 bg-red-50 text-red-700 text-xs rounded-xl">{error}</div>}
+        
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit}  noValidate className="space-y-4">
           <div>
             <label className="block text-xs font-bold text-[#7a5a8c] uppercase tracking-wider mb-1">Full Name</label>
             <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} required className="w-full px-3 py-2 bg-[#faf7fa] border border-[#ebd8e6] rounded-xl text-sm text-[#2a1a33]" />
@@ -98,7 +111,7 @@ export default function EditForm() {
           </div>
           <div>
             <label className="block text-xs font-bold text-[#7a5a8c] uppercase tracking-wider mb-1">Phone Number</label>
-            <input type="text" name="phone" value={formData.phone} onChange={handleChange} className="w-full px-3 py-2 bg-[#faf7fa] border border-[#ebd8e6] rounded-xl text-sm text-[#2a1a33]" />
+            <input type="text" name="phone" value={formData.phone} onChange={handleChange} required className="w-full px-3 py-2 bg-[#faf7fa] border border-[#ebd8e6] rounded-xl text-sm text-[#2a1a33]" />
           </div>
           <div>
             <label className="block text-xs font-bold text-[#7a5a8c] uppercase tracking-wider mb-1">Department</label>
@@ -106,11 +119,11 @@ export default function EditForm() {
           </div>
           <div>
             <label className="block text-xs font-bold text-[#7a5a8c] uppercase tracking-wider mb-1">Designation</label>
-            <input type="text" name="designation" value={formData.designation} onChange={handleChange} className="w-full px-3 py-2 bg-[#faf7fa] border border-[#ebd8e6] rounded-xl text-sm text-[#2a1a33]" />
+            <input type="text" name="designation" value={formData.designation} onChange={handleChange} required className="w-full px-3 py-2 bg-[#faf7fa] border border-[#ebd8e6] rounded-xl text-sm text-[#2a1a33]" />
           </div>
           <div>
             <label className="block text-xs font-bold text-[#7a5a8c] uppercase tracking-wider mb-1">Address</label>
-            <input type="text" name="address" value={formData.address} onChange={handleChange} className="w-full px-3 py-2 bg-[#faf7fa] border border-[#ebd8e6] rounded-xl text-sm text-[#2a1a33]" />
+            <input type="text" name="address" value={formData.address} onChange={handleChange} required className="w-full px-3 py-2 bg-[#faf7fa] border border-[#ebd8e6] rounded-xl text-sm text-[#2a1a33]" />
           </div>
           <div>
             <label className="block text-xs font-bold text-[#7a5a8c] uppercase tracking-wider mb-1">Description / Remarks</label>
@@ -118,7 +131,7 @@ export default function EditForm() {
           </div>
           <div>
             <label className="block text-xs font-bold text-[#7a5a8c] uppercase tracking-wider mb-1">Date of Submission</label>
-            <input type="date" name="dateOfSubmission" value={formData.dateOfSubmission} onChange={handleChange} className="w-full px-3 py-2 bg-[#faf7fa] border border-[#ebd8e6] rounded-xl text-sm text-[#2a1a33]" />
+            <input type="date" name="dateOfSubmission" value={formData.dateOfSubmission} onChange={handleChange} required className="w-full px-3 py-2 bg-[#faf7fa] border border-[#ebd8e6] rounded-xl text-sm text-[#2a1a33]" />
           </div>
 
           <button type="submit" className="w-full py-3 bg-[#2a1a33] text-white rounded-2xl font-bold text-sm hover:bg-[#3d274c] transition shadow-lg mt-2">

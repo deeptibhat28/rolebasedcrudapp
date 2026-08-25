@@ -7,6 +7,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import CreateForm from './pages/CreateForm';
 import EditForm from './pages/EditForm';
 import ViewForm from './pages/ViewForm';
+import AdminFormDetails from './pages/AdminFormDetails';
 
 
 export default function App() {
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/create-form" element={<CreateForm/>} />
         <Route path="/edit-form/:id" element={<EditForm/>} />
         <Route path="/view-form/:id" element={<ViewForm/>} />
+        <Route path="/admin/form-details/:id" element={<AdminFormDetails/>} /> 
       </Routes>
     </Router>
   );
