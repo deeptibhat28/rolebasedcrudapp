@@ -1,22 +1,30 @@
 import React, {useState} from "react";
 import { Link, useNavigate } from 'react-router-dom';
 import { loginUser } from "../services/api";
+import { toast } from "react-toastify";
 
 export default function Login() {
 
 const [username, setUsername] = useState('');
 const [password, setPassword] = useState('');
 const [showPassword, setShowPassword] = useState(false);
-const [error, setError] = useState('');
 const navigate = useNavigate();
 
 const handleLogin = async (e) => {
     e.preventDefault();
 
+    if(!username || !password) {
+        toast.warn('Please fill in all required fields.');
+        return;
+    }
+
     try {
         const user = await loginUser(username, password);
         if (user) {
             localStorage.setItem('user', JSON.stringify(user));
+            toast.success('User logged in successfully!');
+            setUsername('');
+            setPassword('');
 
             if (user.role === 'admin') {
                 navigate('/admin-dashboard');
@@ -24,10 +32,11 @@ const handleLogin = async (e) => {
                 navigate('/user-dashboard');
             }
         } else {
-            setError('Invalid username or password');
+            toast.error('Invalid username or password');
         }
     } catch (error) {
-        setError('Something went wrong. Make sure the server is running!');
+        console.error("Login Error:", error);
+        toast.error('Login failed. Please try again.');
     }
 };
 
@@ -40,11 +49,6 @@ return (
             <p className="text-sm text-[#7a5a8c] mt-1">Welcome to your secure management portal</p>
         </div>
 
-        {error && (
-            <div className="mb-4 p-3 bg-red-50 text-red-700 text-xs rounded-xl">
-                {error}
-            </div>   
-        )}
 
         <form onSubmit={handleLogin} className="space-y-5">
             <div>

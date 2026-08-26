@@ -29,3 +29,8 @@ export const updateSubmission = async (id, formData) => {
 export const deleteSubmission = async (id) => {
     await axios.delete(`${API_URL}/submissions/${id}`);
 };
+
+export const getUsers = async () => {
+    const response = await axios.get(`${API_URL}/users`);
+    return response.data;
+}

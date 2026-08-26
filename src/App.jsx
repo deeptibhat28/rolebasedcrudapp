@@ -8,10 +8,14 @@ import CreateForm from './pages/CreateForm';
 import EditForm from './pages/EditForm';
 import ViewForm from './pages/ViewForm';
 import AdminFormDetails from './pages/AdminFormDetails';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 
 export default function App() {
   return (
+    <div>
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
@@ -24,5 +28,8 @@ export default function App() {
         <Route path="/admin/form-details/:id" element={<AdminFormDetails/>} /> 
       </Routes>
     </Router>
+
+    <ToastContainer position="top-center" autoClose={2000}  closeOnClick />
+    </div>
   );
 }

@@ -1,29 +1,45 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { registerUser } from "../services/api";
+import { registerUser, getUsers } from "../services/api";
+import { toast } from 'react-toastify';
 
 export default function Register() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [role, setRole] = useState('user');
     const [showPassword, setShowPassword] = useState(false);
-    const [error, setError] = useState();
+
+    
     const navigate = useNavigate();
 
     const handleRegister = async (e) => {
         e.preventDefault();
 
+        if (!username || !password) {
+          toast.warn('Please fill in all required fields.');
+          return;
+        }
+
         try {
+          const users = await getUsers();
+          const existingUser = users.find((user) => user.username.toLowerCase() === username.toLowerCase());
+
+          if(existingUser) {
+            toast.error('Username already exists. Please choose a diiferent username');
+            setUsername('');
+            setPassword('');
+            return;
+          }
+
             const newUser = { username, password, role};
             const response = await registerUser(newUser);
-
-            if (response) {
-                navigate('/');
-            } else {
-                setError('Registration failed. Try a different username.');
-            }
+            toast.success('Registration successful! Please sign in.');
+            setUsername('');
+            setPassword('');
+            navigate('/');
         } catch (error) {
-            setError('Something went wrong. Make sure json-server is running!');
+            console.error("CRITICAL ERROR:", err);          
+            toast.error('Registration failed. Please try again.');
         }
     };
 
@@ -35,12 +51,7 @@ export default function Register() {
           <p className="text-sm text-[#7a5a8c] mt-1">Sign up to get started</p>
         </div>
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 text-red-700 text-xs rounded-xl">
-            {error}
-          </div>   
-        )}
-
+       
         <form onSubmit={handleRegister} className="space-y-5">
             <div>
                 <label className="block text-xs font-bold text-[#7a5a8c] uppercase tracking-wider mb-1">Username</label>

@@ -10,6 +10,7 @@
     },
     {
       "id": "2",
+      "username": "user",
       "email": "user@test.com",
       "password": "123",
       "role": "user",
@@ -32,34 +33,27 @@
       "password": "aarav123",
       "role": "user",
       "id": "o3JkcHL_R-8"
+    },
+    {
+      "username": "Yayati",
+      "password": "yayati123",
+      "role": "user",
+      "id": "85UL4zjnMfc"
     }
   ],
   "submissions": [
     {
-      "fullName": "DEEPTI BHAT",
-      "email": "deeptibhat2001@gmail.com",
-      "phone": "8082897174",
-      "department": "Computer",
-      "designation": "Developer",
-      "address": "Gurugram",
-      "description": "Excellent",
-      "dateOfSubmission": "2026-08-25",
-      "userId": "6JgKJ1sAmy8",
-      "username": "Deepti",
-      "id": "0t4s450ZMcs"
-    },
-    {
-      "fullName": "Aarav",
-      "email": "aarav123@gmail.com",
-      "phone": "9876541230",
-      "department": "Non-Technical",
-      "designation": "Team Lead",
+      "fullName": "YAYATI",
+      "email": "yayati123@gmail.com",
+      "phone": "7894561230",
+      "department": "Management",
+      "designation": "Manager",
       "address": "Mumbai",
-      "description": "Nothing ",
-      "dateOfSubmission": "2026-08-25",
-      "userId": "o3JkcHL_R-8",
-      "username": "Aarav",
-      "id": "FRVGz0xYhRA"
+      "description": "none",
+      "dateOfSubmission": "2026-08-26",
+      "userId": "85UL4zjnMfc",
+      "username": "Yayati",
+      "id": "XoVlA3GTFx0"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

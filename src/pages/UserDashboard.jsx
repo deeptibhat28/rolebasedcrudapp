@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getSubmissions, deleteSubmission } from '../services/api';
+import { toast } from 'react-toastify';
 
 export default function UserDashboard() {
   const navigate = useNavigate();
@@ -9,6 +10,9 @@ export default function UserDashboard() {
   const [submissions, setSubmissions] = useState([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
 
   useEffect(() => {
     if (!currentUser) {
@@ -28,20 +32,26 @@ export default function UserDashboard() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this submission?')) {
+  const handleDeleteClick= async (id) => {
+    setDeleteId(id);
+    setShowConfirm(true);
+  };
+   const confirmDelete = async () => {
       try {
-        await deleteSubmission(id);
+        await deleteSubmission(deleteId);
         fetchUserSubmissions();
-        setSuccess('Submission deleted successfully.');
+        toast.success('Submission deleted successfully.');
       } catch (err) {
-        setError('Failed to delete submission.');
+        toast.error('Failed to delete submission.');
+      } finally {
+        setShowConfirm(false);
+        setDeleteId(null);
       }
-    }
   };
 
   const handleLogout = () => {
     localStorage.removeItem('user');
+    toast.info("User logged out successfully!")
     navigate('/');
   };
 
@@ -74,8 +84,7 @@ export default function UserDashboard() {
       <div className="max-w-6xl mx-auto bg-white p-6 rounded-3xl shadow-xl border border-white/55">
         <h2 className="text-lg font-bold text-[#2a1a33] mb-4">My Submissions</h2>
 
-        {error && <div className="mb-4 p-3 bg-red-50 text-red-700 text-xs rounded-xl">{error}</div>}
-        {success && <div className="mb-4 p-3 bg-green-50 text-green-700 text-xs rounded-xl">{success}</div>}
+       
 
         {submissions.length === 0 ? (
           <p className="text-[#7a5a8c] text-sm">You haven't added any submissions yet. Click "Create New Form" to get started.</p>
@@ -125,7 +134,7 @@ export default function UserDashboard() {
                         Edit
                       </button>
                       <button 
-                        onClick={() => handleDelete(sub.id)}
+                        onClick={() => handleDeleteClick(sub.id)}
                         className="px-3 py-1 bg-red-50 text-red-600 rounded-xl text-xs font-bold hover:bg-red-100 transition"
                       >
                         Delete
@@ -138,7 +147,34 @@ export default function UserDashboard() {
           </div>
         )}
       </div>
+
+      
+      {showConfirm && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-xs z-50">
+          <div className="bg-white p-6 rounded-3xl shadow-2xl max-w-sm w-full border border-gray-100 text-center">
+            <h3 className="text-lg font-extrabold text-[#2a1a33] mb-2">Are you sure?</h3>
+            <p className="text-xs text-[#7a5a8c] mb-6">Do you really want to delete this submission? This action cannot be undone.</p>
+            
+            <div className="flex justify-center space-x-3">
+              <button 
+                onClick={() => setShowConfirm(false)}
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-[#2a1a33] rounded-xl text-xs font-bold transition"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={confirmDelete}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition shadow-md"
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
     </div>
   );
 }
+
 

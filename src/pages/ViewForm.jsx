@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getSubmissions } from '../services/api';
+import { toast } from 'react-toastify';
+
 
 export default function ViewForm() {
   const navigate = useNavigate();
   const { id } = useParams();
 
   const [submission, setSubmission] = useState(null);
-  const [error, setError] = useState('');
+  
 
   useEffect(() => {
     fetchDetails();
@@ -20,10 +22,10 @@ export default function ViewForm() {
       if (currentSub) {
         setSubmission(currentSub);
       } else {
-        setError('Submission not found.');
+        toast.error('Submission not found.');
       }
     } catch (err) {
-      setError('Failed to fetch submission details.');
+      toast.error('Failed to fetch submission details.');
     }
   };
 
@@ -40,7 +42,7 @@ export default function ViewForm() {
           </button>
         </div>
 
-        {error && <div className="mb-4 p-3 bg-red-50 text-red-700 text-xs rounded-xl">{error}</div>}
+        
 
         {submission ? (
           <div className="space-y-4 text-sm">
@@ -77,7 +79,7 @@ export default function ViewForm() {
             </div>
 
             <div className="bg-[#faf7fa] p-4 rounded-2xl border border-[#ebd8e6]">
-              <span className="text-xs font-bold text-[#7a5a8c] uppercase tracking-wider block mb-1">Description / Remarks</span>
+              <span className="text-xs font-bold text-[#7a5a8c] uppercase tracking-wider block mb-1">Description</span>
               <p className="font-medium text-[#2a1a33]">{submission.description || 'No remarks provided'}</p>
             </div>
 

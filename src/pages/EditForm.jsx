@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getSubmissions, updateSubmission } from '../services/api';
+import { toast } from 'react-toastify';
 
 export default function EditForm() {
   const navigate = useNavigate();
@@ -17,7 +18,6 @@ export default function EditForm() {
     description: '',
     dateOfSubmission: ''
   });
-//   const [error, setError] = useState('');
 
   useEffect(() => {
     fetchSubmissionData();
@@ -39,10 +39,10 @@ export default function EditForm() {
           dateOfSubmission: currentSub.dateOfSubmission || ''
         });
       } else {
-        alert('Submission not found.');
+        toast.error('Submission not found.');
       }
     } catch (err) {
-      alert('Failed to load submission details.');
+      toast.error('Failed to load submission details.');
     }
   };
 
@@ -55,19 +55,19 @@ export default function EditForm() {
   
 
     if (!formData.fullName || !formData.department || !formData.email || !formData.phone || !formData.designation || !formData.address || !formData.dateOfSubmission) {
-      alert('Please fill in all required fields.');
+      toast.warn('Please fill in all required fields.');
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      alert('Please enter a valid email address.');
+      toast.warn('Please enter a valid email address.');
       return;
     }
     if (formData.phone) {
       const phoneRegex = /^\d{10}$/;
       if (!phoneRegex.test(formData.phone)) {
-        alert('Please enter a valid phone number (must be exactly 10 digits)');
+        toast.warn('Please enter a valid phone number (must be exactly 10 digits)');
         return;
       }
     }
@@ -79,9 +79,10 @@ export default function EditForm() {
         username: currentUser.username,
       };
       await updateSubmission(id, updatedRecord);
+      toast.success('Record updated successfully');
       navigate('/user-dashboard'); 
     } catch (err) {
-      alert('Failed to update submission. Please try again.');
+      toast.error('Failed to update submission. Please try again.');
     }
   };
 
@@ -126,7 +127,7 @@ export default function EditForm() {
             <input type="text" name="address" value={formData.address} onChange={handleChange} required className="w-full px-3 py-2 bg-[#faf7fa] border border-[#ebd8e6] rounded-xl text-sm text-[#2a1a33]" />
           </div>
           <div>
-            <label className="block text-xs font-bold text-[#7a5a8c] uppercase tracking-wider mb-1">Description / Remarks</label>
+            <label className="block text-xs font-bold text-[#7a5a8c] uppercase tracking-wider mb-1">Description</label>
             <textarea name="description" value={formData.description} onChange={handleChange} rows="2" className="w-full px-3 py-2 bg-[#faf7fa] border border-[#ebd8e6] rounded-xl text-sm text-[#2a1a33]" />
           </div>
           <div>
