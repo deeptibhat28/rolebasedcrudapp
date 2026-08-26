@@ -39,6 +39,12 @@
       "password": "yayati123",
       "role": "user",
       "id": "85UL4zjnMfc"
+    },
+    {
+      "username": "Genevieve",
+      "password": "gene123",
+      "role": "user",
+      "id": "AX0-fKBbcZ4"
     }
   ],
   "submissions": [
@@ -54,6 +60,45 @@
       "userId": "85UL4zjnMfc",
       "username": "Yayati",
       "id": "XoVlA3GTFx0"
+    },
+    {
+      "fullName": "GENEVIEVE",
+      "email": "gene23@gmail.com",
+      "phone": "6547893210",
+      "department": "HR",
+      "designation": "HR Manager",
+      "address": "Hyderabad",
+      "description": "Hiring young professionals.",
+      "dateOfSubmission": "2026-08-26",
+      "userId": "AX0-fKBbcZ4",
+      "username": "Genevieve",
+      "id": "ziQWbll_j3I"
+    },
+    {
+      "fullName": "AARAV",
+      "email": "a12@gmail.com",
+      "phone": "7893214560",
+      "department": "Technical",
+      "designation": "Technical Lead",
+      "address": "Bengaluru",
+      "description": "Leading tech team.",
+      "dateOfSubmission": "2026-08-26",
+      "userId": "o3JkcHL_R-8",
+      "username": "Aarav",
+      "id": "BpKdVfMbmsk"
+    },
+    {
+      "fullName": "DEEPTI",
+      "email": "deeptibhat2001@gmail.com",
+      "phone": "8082897174",
+      "department": "Development",
+      "designation": "Web Developer",
+      "address": "Gurugram",
+      "description": "Expertise in web development.",
+      "dateOfSubmission": "2026-08-26",
+      "userId": "6JgKJ1sAmy8",
+      "username": "Deepti",
+      "id": "wVK5jG2Uw10"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

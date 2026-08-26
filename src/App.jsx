@@ -29,7 +29,7 @@ export default function App() {
       </Routes>
     </Router>
 
-    <ToastContainer position="top-center" autoClose={2000}  closeOnClick />
+    <ToastContainer position="top-center" autoClose={1000}  closeOnClick />
     </div>
   );
 }
