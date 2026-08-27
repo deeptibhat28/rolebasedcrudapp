@@ -59,55 +59,58 @@ export default function CreateForm() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-[#ebd5e2] to-[#cbb2d4] p-6 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-3xl shadow-xl border border-white/55 max-w-lg w-full">
+    <div className="min-h-screen w-full bg-[#1a0b2e] px-4 py-8 relative overflow-hidden flex items-center justify-center text-white">
+      
+      
+      <div className="absolute -top-32 -left-32 w-96 h-96 bg-purple-600/35 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div className="bg-[#28133f] p-8 rounded-3xl shadow-2xl border border-purple-900/50 max-w-lg w-full relative z-10">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-xl font-extrabold text-[#2a1a33]">New Submission Form</h1>
+          <h1 className="text-xl font-extrabold text-white">New Submission Form</h1>
           <button 
             onClick={() => navigate('/user-dashboard')}
-            className="text-xs font-bold text-[#7a5a8c] hover:text-[#2a1a33]"
+            className="text-xs font-bold text-purple-300 hover:text-white transition"
           >
             Back to Dashboard
           </button>
         </div>
 
-       
-
         <form onSubmit={handleSubmit} noValidate className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-[#7a5a8c] uppercase tracking-wider mb-1">Full Name</label>
-            <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} required className="w-full px-3 py-2 bg-[#faf7fa] border border-[#ebd8e6] rounded-xl text-sm text-[#2a1a33]" />
+            <label className="block text-xs font-bold text-purple-300 uppercase tracking-wider mb-1">Full Name</label>
+            <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} required className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500" />
           </div>
           <div>
-            <label className="block text-xs font-bold text-[#7a5a8c] uppercase tracking-wider mb-1">Email Address</label>
-            <input type="text" name="email" value={formData.email} onChange={handleChange} required className="w-full px-3 py-2 bg-[#faf7fa] border border-[#ebd8e6] rounded-xl text-sm text-[#2a1a33]" />
+            <label className="block text-xs font-bold text-purple-300 uppercase tracking-wider mb-1">Email Address</label>
+            <input type="text" name="email" value={formData.email} onChange={handleChange} required className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500" />
           </div>
           <div>
-            <label className="block text-xs font-bold text-[#7a5a8c] uppercase tracking-wider mb-1">Phone Number</label>
-            <input type="text" name="phone" value={formData.phone} onChange={handleChange} required className="w-full px-3 py-2 bg-[#faf7fa] border border-[#ebd8e6] rounded-xl text-sm text-[#2a1a33]" />
+            <label className="block text-xs font-bold text-purple-300 uppercase tracking-wider mb-1">Phone Number</label>
+            <input type="text" name="phone" value={formData.phone} onChange={handleChange} required className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500" />
           </div>
           <div>
-            <label className="block text-xs font-bold text-[#7a5a8c] uppercase tracking-wider mb-1">Department</label>
-            <input type="text" name="department" value={formData.department} onChange={handleChange} required className="w-full px-3 py-2 bg-[#faf7fa] border border-[#ebd8e6] rounded-xl text-sm text-[#2a1a33]" />
+            <label className="block text-xs font-bold text-purple-300 uppercase tracking-wider mb-1">Department</label>
+            <input type="text" name="department" value={formData.department} onChange={handleChange} required className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500" />
           </div>
           <div>
-            <label className="block text-xs font-bold text-[#7a5a8c] uppercase tracking-wider mb-1">Designation</label>
-            <input type="text" name="designation" value={formData.designation} onChange={handleChange}required className="w-full px-3 py-2 bg-[#faf7fa] border border-[#ebd8e6] rounded-xl text-sm text-[#2a1a33]" />
+            <label className="block text-xs font-bold text-purple-300 uppercase tracking-wider mb-1">Designation</label>
+            <input type="text" name="designation" value={formData.designation} onChange={handleChange} required className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500" />
           </div>
           <div>
-            <label className="block text-xs font-bold text-[#7a5a8c] uppercase tracking-wider mb-1">Address</label>
-            <input type="text" name="address" value={formData.address} onChange={handleChange} required className="w-full px-3 py-2 bg-[#faf7fa] border border-[#ebd8e6] rounded-xl text-sm text-[#2a1a33]" />
+            <label className="block text-xs font-bold text-purple-300 uppercase tracking-wider mb-1">Address</label>
+            <input type="text" name="address" value={formData.address} onChange={handleChange} required className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500" />
           </div>
           <div>
-            <label className="block text-xs font-bold text-[#7a5a8c] uppercase tracking-wider mb-1">Description</label>
-            <textarea name="description" value={formData.description} onChange={handleChange} rows="2" className="w-full px-3 py-2 bg-[#faf7fa] border border-[#ebd8e6] rounded-xl text-sm text-[#2a1a33]" />
+            <label className="block text-xs font-bold text-purple-300 uppercase tracking-wider mb-1">Description</label>
+            <textarea name="description" value={formData.description} onChange={handleChange} rows="2" className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500" />
           </div>
           <div>
-            <label className="block text-xs font-bold text-[#7a5a8c] uppercase tracking-wider mb-1">Date of Submission</label>
-            <input type="date" name="dateOfSubmission" value={formData.dateOfSubmission} onChange={handleChange} required className="w-full px-3 py-2 bg-[#faf7fa] border border-[#ebd8e6] rounded-xl text-sm text-[#2a1a33]" />
+            <label className="block text-xs font-bold text-purple-300 uppercase tracking-wider mb-1">Date of Submission</label>
+            <input type="date" name="dateOfSubmission" value={formData.dateOfSubmission} onChange={handleChange} required className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500 color-scheme-dark" />
           </div>
 
-          <button type="submit" className="w-full py-3 bg-[#2a1a33] text-white rounded-2xl font-bold text-sm hover:bg-[#3d274c] transition shadow-lg mt-2">
+          <button type="submit" className="w-full py-3 bg-linear-to-r from-red-500 to-orange-500 hover:opacity-95 text-white rounded-2xl font-bold text-sm transition shadow-lg mt-2">
             Submit Record
           </button>
         </form>
