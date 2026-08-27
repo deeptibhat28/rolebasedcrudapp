@@ -1,5 +1,5 @@
 import axios from 'axios';
-const API_URL = 'https://rolebasedcrudapp.onrender.com';
+const API_URL = 'https://6a90168dff2484963a5db61a.mockapi.io';
 
 export const loginUser = async (username, password) => {
     const response = await axios.get(`${API_URL}/users?username=${username}&password=${password}`);
