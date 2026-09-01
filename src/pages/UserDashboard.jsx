@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 export default function UserDashboard() {
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState(
-    JSON.parse(localStorage.getItem("user")) || {},
+    JSON.parse(localStorage.getItem("user") || localStorage.getItem("currentUser")),
   );
 
   const handleUpdateUser = (updatedUser) => {
@@ -62,6 +62,8 @@ export default function UserDashboard() {
 
   const handleLogout = () => {
     localStorage.removeItem("user");
+    localStorage.removeItem("currentUser");
+    localStorage.removeItem("isLoggedIn")
     toast.success("User logged out successfully!");
     navigate("/");
   };

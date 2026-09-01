@@ -10,6 +10,8 @@ import ViewForm from './pages/ViewForm';
 import AdminFormDetails from './pages/AdminFormDetails';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Setup2FA from './components/Setup2FA';
+
 
 
 
@@ -26,10 +28,11 @@ export default function App() {
         <Route path="/edit-form/:id" element={<EditForm/>} />
         <Route path="/view-form/:id" element={<ViewForm/>} />
         <Route path="/admin/form-details/:id" element={<AdminFormDetails/>} /> 
+        <Route path='/setup-2fa' element={<Setup2FA/>} />
       </Routes>
     </Router>
 
-    <ToastContainer position="top-center" autoClose={1000}  closeOnClick />
+    <ToastContainer position="top-center" autoClose={2000}  closeOnClick />
     </div>
   );
 }

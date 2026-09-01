@@ -48,7 +48,7 @@ export default function AdminDashboard() {
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    toast.info("User logged out successfully!");
+    toast.success("User logged out successfully!");
     navigate("/");
   };
 

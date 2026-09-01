@@ -26,16 +26,9 @@ export default function Login() {
           setPendingUser(user);
           toast.info("Please enter your 2FA verification code.");
         } else {
-          localStorage.setItem("user", JSON.stringify(user));
-          toast.success("User logged in successfully!");
-          setUsername("");
-          setPassword("");
-
-          if (user.role === "admin") {
-            navigate("/admin-dashboard");
-          } else {
-            navigate("/user-dashboard");
-          }
+          localStorage.setItem("tempUserId", user.id);
+          toast.info("Please set up Two-Factor Authentication for your account.");
+          navigate("/setup-2fa");
         }
       } else {
         toast.error("Invalid username or password");

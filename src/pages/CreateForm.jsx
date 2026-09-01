@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 
 export default function CreateForm() {
   const navigate = useNavigate();
-  const currentUser = JSON.parse(localStorage.getItem("user"));
+  const currentUser = JSON.parse(localStorage.getItem("user") || localStorage.getItem("currentUser")) || {};
 
   const [formData, setFormData] = useState({
     fullName: "",
