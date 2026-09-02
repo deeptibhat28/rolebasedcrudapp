@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createSubmission } from "../services/api";
 import { toast } from "react-toastify";
+import { logActivity } from "../utils/logger";
 
 export default function CreateForm() {
   const navigate = useNavigate();
@@ -64,6 +65,12 @@ export default function CreateForm() {
         username: currentUser.username,
       };
       await createSubmission(newRecord);
+      
+      logActivity(
+        "FORM_CREATE",
+        `Created new form submission for: ${formData.fullName}`,
+        currentUser?.username || "User"
+      )
       toast.success("Form submitted successfully!");
       navigate("/user-dashboard");
     } catch (err) {

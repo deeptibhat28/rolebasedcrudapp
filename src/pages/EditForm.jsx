@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getSubmissions, updateSubmission } from "../services/api";
 import { toast } from "react-toastify";
+import { logActivity } from "../utils/logger";
 
 export default function EditForm() {
   const navigate = useNavigate();
@@ -109,6 +110,13 @@ export default function EditForm() {
         username: currentUser.username,
       };
       await updateSubmission(id, updatedRecord);
+
+      logActivity(
+        "FORM_UPDATE",
+        `Updated submission record for: ${formData.fullName || "User Record"}`,
+        currentUser?.username || "User"
+      );
+
       toast.success("Record updated successfully");
       navigate("/user-dashboard");
     } catch (err) {

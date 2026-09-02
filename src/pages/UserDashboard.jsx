@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getSubmissions, deleteSubmission } from "../services/api";
 import { toast } from "react-toastify";
+import { logActivity } from "../utils/logger";
 
 export default function UserDashboard() {
   const navigate = useNavigate();
@@ -49,7 +50,16 @@ export default function UserDashboard() {
   };
   const confirmDelete = async () => {
     try {
+      const targetSub = submissions.find((sub) => sub.id === deleteId);
+      const subName = targetSub ? targetSub.fullName : `ID: ${deleteId}`;
+      
       await deleteSubmission(deleteId);
+
+      logActivity(
+        "FORM_DELETE",
+        `Deleted form submission for: ${subName}`,
+        currentUser?.username || "User"
+      );
       fetchUserSubmissions();
       toast.success("Submission deleted successfully.");
     } catch (err) {

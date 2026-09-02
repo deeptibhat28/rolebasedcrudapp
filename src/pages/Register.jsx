@@ -4,6 +4,8 @@ import { registerUser, getUsers } from "../services/api";
 import { toast } from "react-toastify";
 import * as OTPAuth from "otpauth";
 import QRCode from "qrcode";
+import { logActivity } from "../utils/logger";
+
 
 export default function Register() {
   const [username, setUsername] = useState("");
@@ -60,6 +62,7 @@ export default function Register() {
 
       const response = await registerUser(newUser);
       if (response) {
+        logActivity("USER_REGISTER", `New user registered: ${username} (${role})`, username);
         setQrCodeUrl(qrDataUrl);
         setIsRegistered(true);
         toast.success(

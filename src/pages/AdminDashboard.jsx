@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { deleteSubmission, getSubmissions } from "../services/api";
 import { toast } from "react-toastify";
+import ActivityLogs from "./ActivityLogs";
+import { logActivity } from "../utils/logger";
+
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -35,7 +38,18 @@ export default function AdminDashboard() {
   };
   const confirmDelete = async () => {
     try {
+
+      const targetSub = submissions.find((sub) => sub.id === deleteId);
+      const subName = targetSub ? targetSub.fullName : `ID: ${deleteId}`;
+      
       await deleteSubmission(deleteId);
+
+      logActivity(
+        "FORM_DELETE",
+        `Deleted form submission for: ${subName}`,
+        currentUser?.username || "Admin"
+      );
+
       fetchAllSubmissions();
       toast.success("Submission deleted successfully.");
     } catch (err) {
@@ -75,6 +89,10 @@ export default function AdminDashboard() {
         >
           Logout
         </button>
+      </div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
+        <ActivityLogs />
       </div>
 
       <div className="max-w-7xl mx-auto bg-[#28133f] p-6 rounded-3xl shadow-xl border border-purple-900/50 relative z-10">
