@@ -5,7 +5,6 @@ import { toast } from "react-toastify";
 import ActivityLogs from "./ActivityLogs";
 import { logActivity } from "../utils/logger";
 
-
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const currentUser = JSON.parse(localStorage.getItem("user"));
@@ -15,6 +14,11 @@ export default function AdminDashboard() {
 
   const [showConfirm, setShowConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   useEffect(() => {
     if (!currentUser || currentUser.role !== "admin") {
@@ -38,16 +42,15 @@ export default function AdminDashboard() {
   };
   const confirmDelete = async () => {
     try {
-
       const targetSub = submissions.find((sub) => sub.id === deleteId);
       const subName = targetSub ? targetSub.fullName : `ID: ${deleteId}`;
-      
+
       await deleteSubmission(deleteId);
 
       logActivity(
         "FORM_DELETE",
         `Deleted form submission for: ${subName}`,
-        currentUser?.username || "Admin"
+        currentUser?.username || "Admin",
       );
 
       fetchAllSubmissions();
@@ -65,6 +68,29 @@ export default function AdminDashboard() {
     toast.success("User logged out successfully!");
     navigate("/");
   };
+
+  const filteredSubmissions = submissions.filter((sub) => {
+    const term = searchTerm.toLowerCase();
+    const username = (sub.username || "").toLowerCase();
+    const fullName = (sub.fullName || "").toLowerCase();
+    const email = (sub.email || "").toLowerCase();
+    const department = (sub.department || "").toLowerCase();
+
+    return (
+      username.includes(term) ||
+      fullName.includes(term) ||
+      email.includes(term) ||
+      department.includes(term)
+    );
+  });
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentSubmissions = filteredSubmissions.slice(
+    indexOfFirstItem,
+    indexOfLastItem,
+  );
+  const totalPages = Math.ceil(filteredSubmissions.length / itemsPerPage);
 
   return (
     <div className="min-h-screen w-full bg-[#1a0b2e] px-6 py-8 relative overflow-hidden text-white">
@@ -96,16 +122,42 @@ export default function AdminDashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto bg-[#28133f] p-6 rounded-3xl shadow-xl border border-purple-900/50 relative z-10">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-lg font-bold text-white">All User Submissions</h2>
-          <span className="px-3 py-1 bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-xl text-xs font-bold">
-            Total Records: {submissions.length}
+        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+          <div>
+            <h2 className="text-lg font-bold text-white">
+              All User Submissions
+            </h2>
+            <p className="text-xs text-purple-200/70">
+              Manage and search user form entries
+            </p>
+          </div>
+
+          <div className="w-full md:w-72">
+            <input
+              type="text"
+              placeholder="Search by username, name, email"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="w-full px-4 py-2 bg-purple-950/50 border border-purple-800/60 rounded-xl text-xs text-white placeholder-purple-300/50 focus:outline-none focus:border-purple-500 transition"
+            />
+          </div>
+
+          <span className="px-3 py-1 bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-xl text-xs font-bold whitespace-nowrap">
+            Total Records: {filteredSubmissions.length}{" "}
+            {searchTerm && `(filtered from ${submissions.length})`}
           </span>
         </div>
 
         {submissions.length === 0 ? (
           <p className="text-purple-200/70 text-sm">
             No submissions found from any users yet.
+          </p>
+        ) : filteredSubmissions.length === 0 ? (
+          <p className="text-purple-200/70 text-sm text-center py-6">
+            No matching submissions found for "{searchTerm}".
           </p>
         ) : (
           <div className="overflow-x-auto">
@@ -124,7 +176,7 @@ export default function AdminDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-purple-900/30 text-sm text-white">
-                {submissions.map((sub) => (
+                {currentSubmissions.map((sub) => (
                   <tr
                     key={sub.id}
                     className="hover:bg-purple-900/20 transition"
@@ -211,6 +263,40 @@ export default function AdminDashboard() {
           </div>
         )}
       </div>
+
+      {filteredSubmissions.length > itemsPerPage && (
+        <div className="max-w-7xl mx-auto mt-4 px-2 flex justify-between items-center text-white relative z-10">
+          <p className="text-xs text-purple-200/70">
+            Showing {filteredSubmissions.length > 0 ? indexOfFirstItem + 1 : 0}{" "}
+            to {Math.min(indexOfLastItem, filteredSubmissions.length)} of{" "}
+            {filteredSubmissions.length} entries
+          </p>
+
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-1.5 bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-xl text-xs font-bold hover:bg-purple-500/30 transition disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+
+            <span className="px-3 py-1.5 bg-[#28133f] text-white rounded-xl text-xs font-bold border border-purple-900">
+              Page {currentPage} of {totalPages || 1}
+            </span>
+
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages || totalPages === 0}
+              className="px-3 py-1.5 bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-xl text-xs font-bold hover:bg-purple-500/30 transition disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
 
       {showConfirm && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-xs z-50 px-4">
