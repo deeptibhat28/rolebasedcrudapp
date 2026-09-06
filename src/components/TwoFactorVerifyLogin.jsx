@@ -25,7 +25,7 @@ function TwoFactorVerifyLogin({ user, onLoginSuccess }) {
     const delta = totp.validate({ token: token, window: 1 });
 
     if (delta !== null) {
-      toast.success("2FA verification successfully!");
+      // toast.success("2FA verification successfully!");
       onLoginSuccess();
     } else {
       toast.error("Invalid or expired 30-second code. Try again.");

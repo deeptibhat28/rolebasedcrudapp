@@ -11,6 +11,7 @@ import AdminFormDetails from './pages/AdminFormDetails';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Setup2FA from './components/Setup2FA';
+import ActivityLogs from "./pages/ActivityLogs";
 
 
 
@@ -21,6 +22,7 @@ export default function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/user-dashboard" element={<UserDashboard/>} />
         <Route path="/admin-dashboard" element={<AdminDashboard/>} />
@@ -29,6 +31,7 @@ export default function App() {
         <Route path="/view-form/:id" element={<ViewForm/>} />
         <Route path="/admin/form-details/:id" element={<AdminFormDetails/>} /> 
         <Route path='/setup-2fa' element={<Setup2FA/>} />
+        <Route path='/activity-logs' element={<ActivityLogs/>} />
       </Routes>
     </Router>
 

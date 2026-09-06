@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "../services/api";
 import { toast } from "react-toastify";
 import TwoFactorVerifyLogin from "../components/TwoFactorVerifyLogin";
+import { logActivity } from "../utils/logger";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -31,6 +32,7 @@ export default function Login() {
           navigate("/setup-2fa");
         }
       } else {
+        logActivity("Failed_LOGIN", `Failed login attempt for username: ${username}`, username);
         toast.error("Invalid username or password");
       }
     } catch (error) {
@@ -45,6 +47,12 @@ export default function Login() {
         user={pendingUser}
         onLoginSuccess={() => {
           localStorage.setItem("user", JSON.stringify(pendingUser));
+
+          logActivity(
+            "USER_LOGIN",
+            `User ${pendingUser.username} logged into the system.`,
+            pendingUser.username
+          )
           toast.success("Logged in successfully!");
 
           if (pendingUser.role === "admin") {

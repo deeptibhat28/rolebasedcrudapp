@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { deleteSubmission, getSubmissions } from "../services/api";
 import { toast } from "react-toastify";
-import ActivityLogs from "./ActivityLogs";
 import { logActivity } from "../utils/logger";
+
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -109,6 +109,14 @@ export default function AdminDashboard() {
             </span>
           </p>
         </div>
+
+        <div className="space-x-3 flex items-center">
+    <button
+      onClick={() => navigate("/activity-logs")}
+      className="px-4 py-2.5 bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-xl font-bold text-sm hover:bg-purple-500/30 transition duration-200 shadow-md"
+    >
+      Activity Logs
+    </button>
         <button
           onClick={handleLogout}
           className="px-4 py-2.5 bg-red-500/20 text-red-300 border border-red-500/30 rounded-xl font-bold text-sm hover:bg-red-500/30 transition duration-200"
@@ -116,11 +124,12 @@ export default function AdminDashboard() {
           Logout
         </button>
       </div>
-
-      <div className="max-w-7xl mx-auto relative z-10">
-        <ActivityLogs />
       </div>
-
+    
+      {/* <div className="max-w-7xl mx-auto relative z-10"> */}
+        {/* <ActivityLogs /> */}
+      {/* </div>  */}
+          
       <div className="max-w-7xl mx-auto bg-[#28133f] p-6 rounded-3xl shadow-xl border border-purple-900/50 relative z-10">
         <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
           <div>
@@ -165,14 +174,12 @@ export default function AdminDashboard() {
               <thead>
                 <tr className="border-b border-purple-900/50 text-xs font-bold text-purple-300 uppercase">
                   <th className="pb-3 px-2">Submitted By (User)</th>
-                  <th className="pb-3 px-2">Full Name / Email</th>
-                  <th className="pb-3 px-2">Phone No./ Address</th>
-                  <th className="pb-3 px-2">Dept / Desig</th>
-                  <th className="pb-3 px-2">Gender / Edu</th>
-                  <th className="pb-3 px-2">Skills</th>
-                  <th className="pb-3 px-2">Description</th>
+                  <th className="pb-3 px-2">Full Name</th>
+                  <th className="pb-3 px-2">Email</th>
+                  <th className="pb-3 px-2">Phone</th>
+                  <th className="pb-3 px-2">Gender</th>
                   <th className="pb-3 px-2">Date</th>
-                  <th className="pb-3 px-2 text-right">Actions</th>
+                  <th className="pb-3 px-2 text-right pr-12">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-purple-900/30 text-sm text-white">
@@ -188,6 +195,8 @@ export default function AdminDashboard() {
                     </td>
                     <td className="py-3 px-2">
                       <div className="font-bold">{sub.fullName}</div>
+                      </td>
+                      <td>
                       <div className="text-xs text-purple-200/70">
                         {sub.email}
                       </div>
@@ -196,44 +205,12 @@ export default function AdminDashboard() {
                       <div className="text-xs font-medium">
                         {sub.phone || "N/A"}
                       </div>
-                      <div className="text-xs text-purple-200/70">
-                        {sub.address || "N/A"}
-                      </div>
                     </td>
-                    <td className="py-3 px-2">
-                      <div className="font-medium">{sub.department}</div>
-                      <div className="text-xs text-purple-200/70">
-                        {sub.designation}
-                      </div>
-                    </td>
+                    
                     <td className="py-3 px-2">
                       <div className="font-medium">{sub.gender || "N/A"}</div>
-                      <div className="text-xs text-purple-200/70">
-                        {sub.education === "Other"
-                          ? sub.customEducation
-                          : sub.education || "N/A"}
-                      </div>
                     </td>
-                    <td className="py-3 px-2">
-                      <div
-                        className="text-xs text-purple-200 max-w-xs truncate"
-                        title={
-                          Array.isArray(sub.skills)
-                            ? sub.skills.join(", ")
-                            : sub.skills
-                        }
-                      >
-                        {Array.isArray(sub.skills)
-                          ? sub.skills.join(", ")
-                          : sub.skills || "N/A"}
-                      </div>
-                    </td>
-                    <td
-                      className="py-3 px-2 text-xs text-purple-200/70 max-w-37.5 truncate"
-                      title={sub.description || "No remarks"}
-                    >
-                      {sub.description || "No remarks"}
-                    </td>
+                    
                     <td className="py-3 px-2 text-xs text-purple-200/70">
                       {sub.dateOfSubmission
                         ? sub.dateOfSubmission.split("-").reverse().join("/")
