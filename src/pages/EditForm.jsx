@@ -105,7 +105,7 @@ export default function EditForm() {
       return;
     }
 
-    const strictEmailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov|co|io)$/i;
+    const strictEmailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.(com|in|org|net|edu|gov|co|io)$/i;
 
     if (!strictEmailRegex.test(emailValue)) {
       toast.warn("Please enter a valid email address(e.g., example123@gmail.com).");
