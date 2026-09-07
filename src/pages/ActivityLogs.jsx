@@ -56,6 +56,7 @@ export default function ActivityLogs() {
 
   const handleLogout = () => {
     localStorage.removeItem("currentUser");
+    toast.success("User logged out successfully");
     navigate("/login");
   };
 
@@ -65,50 +66,53 @@ export default function ActivityLogs() {
   const currentLogs = logs.slice(indexOfFirstLog, indexOfLastLog);
   const totalPages = Math.ceil(logs.length / logsPerPage) || 1;
 
-  return (
-    <div className="min-h-screen w-full bg-[#1a0b2e] px-4 py-8 relative overflow-hidden text-white">
-    
-      <div className="absolute -top-32 -left-32 w-96 h-96 bg-purple-600/35 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
+ return (
+    <div className="min-h-screen w-full bg-[#F9B2BC] px-4 py-8 relative overflow-hidden text-[#4a242c]">
+      <div className="absolute -top-32 -left-32 w-96 h-96 bg-white/30 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#F67C8E]/20 rounded-full blur-3xl pointer-events-none"></div>
 
      
-      <div className="w-[92%] max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center bg-[#28133f] p-6 rounded-3xl shadow-xl mb-6 border border-purple-900/50 z-10 relative">
+      <div className="w-[92%] max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center bg-[#FCD3DC] backdrop-blur-md p-6 rounded-3xl shadow-xl mb-6 border border-white/60 z-10 relative">
         <div className="mb-4 md:mb-0">
-          <h1 className="text-2xl font-extrabold text-white">System Activity Logs</h1>
-          <p className="text-sm text-purple-200/70">
+          <h1 className="text-2xl font-extrabold text-[#4a242c]">
+            System Activity Logs
+          </h1>
+          <p className="text-sm text-[#68333e]/80">
             Track critical security events and administrative actions in real time.
           </p>
         </div>
         <div className="space-x-3 flex items-center">
           <button
             onClick={() => navigate("/admin-dashboard")}
-            className="px-4 py-2.5 bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-xl font-bold text-sm hover:bg-purple-500/30 transition duration-200 shadow-md"
+            className="px-4 py-2.5 bg-[#F6B8C2]/50 text-[#5c2d36] border border-[#D58C99] rounded-xl font-bold text-sm hover:bg-[#F6B8C2] transition duration-200 shadow-md"
           >
             Dashboard
           </button>
           <button
             onClick={handleLogout}
-            className="px-4 py-2.5 bg-red-500/20 text-red-300 border border-red-500/30 rounded-xl font-bold text-sm hover:bg-red-500/30 transition duration-200"
+            className="px-4 py-2.5 bg-red-500/20 text-red-700 border border-red-500/30 rounded-xl font-bold text-sm hover:bg-red-500/30 transition duration-200"
           >
             Logout
           </button>
         </div>
       </div>
 
-      
-      <div className="w-[92%] max-w-7xl mx-auto bg-[#28133f] p-6 rounded-3xl shadow-xl border border-purple-900/50 relative z-10 mb-6">
+     
+      <div className="w-[92%] max-w-7xl mx-auto bg-[#FCD3DC] backdrop-blur-md p-6 rounded-3xl shadow-xl border border-white/60 relative z-10 mb-4">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h2 className="text-lg font-bold text-white">Activity Records</h2>
-            <p className="text-xs text-purple-200/70">Showing log entries history</p>
+            <h2 className="text-lg font-bold text-[#4a242c]">Activity Records</h2>
+            <p className="text-xs text-[#68333e]/80">
+              Showing log entries history
+            </p>
           </div>
           <div className="flex items-center space-x-3">
-            <span className="px-3 py-1 bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-xl text-xs font-bold">
+            <span className="px-3 py-1 bg-[#F6B8C2]/50 text-[#5c2d36] border border-[#D58C99] rounded-xl text-xs font-bold">
               Total Logs: {logs.length}
             </span>
-            <button 
+            <button
               onClick={handleClearLogs}
-              className="px-3 py-1.5 bg-red-500/20 text-red-300 border border-red-500/30 rounded-xl text-xs font-bold hover:bg-red-500/30 transition duration-200"
+              className="px-3 py-1.5 bg-red-500/20 text-red-700 border border-red-500/30 rounded-xl text-xs font-bold hover:bg-red-500/30 transition duration-200"
             >
               Clear Logs
             </button>
@@ -118,34 +122,41 @@ export default function ActivityLogs() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-purple-900/50 text-xs font-bold text-purple-300 uppercase tracking-wider">
-                <th className="pb-3 px-2">Timestamp</th>
-                <th className="pb-3 px-2">User</th>
-                <th className="pb-3 px-2">Action Type</th>
-                <th className="pb-3 px-2">Details</th>
-                <th className="pb-3 px-2 text-right pr-5">Action</th>
+              <tr className="border-b border-[#D58C99] text-xs font-bold text-[#5c2d36] uppercase tracking-wider">
+                <th className="pb-3 px-3">Timestamp</th>
+                <th className="pb-3 px-3">User</th>
+                <th className="pb-3 px-3">Action Type</th>
+                <th className="pb-3 px-3">Details</th>
+                <th className="pb-3 px-3 text-right pr-5">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-purple-900/30 text-sm text-white">
+            <tbody className="text-sm text-[#4a242c]">
               {currentLogs.length > 0 ? (
                 currentLogs.map((log) => (
-                  <tr key={log.id} className="hover:bg-purple-900/20 transition">
-                    <td className="py-3 px-2 text-xs text-purple-200/75 whitespace-nowrap">{log.timestamp}</td>
-                    <td className="py-3 px-2">
-                      <span className="px-2.5 py-1 bg-purple-600 text-white rounded-lg text-xs font-bold shadow-sm">
+                  <tr
+                    key={log.id}
+                    className="border-b border-[#D58C99]/30 group"
+                  >
+                    <td className="py-3 px-3 text-xs text-[#68333e]/80 whitespace-nowrap group-hover:bg-[#F6B8C2]/30 transition">
+                      {log.timestamp}
+                    </td>
+                    <td className="py-3 px-3 group-hover:bg-[#F6B8C2]/30 transition">
+                      <span className="px-2.5 py-1 bg-[#F45B73] text-white rounded-lg text-xs font-bold shadow-sm inline-block">
                         {log.actor}
                       </span>
                     </td>
-                    <td className="py-3 px-2">
-                      <span className="px-2.5 py-1 bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-lg text-xs font-bold font-mono">
+                    <td className="py-3 px-3 group-hover:bg-[#F6B8C2]/30 transition">
+                      <span className="px-2.5 py-1 bg-[#F6B8C2]/50 text-[#5c2d36] border border-[#D58C99] rounded-lg text-xs font-bold font-mono inline-block">
                         {log.action}
                       </span>
                     </td>
-                    <td className="py-3 px-2 text-purple-200">{log.details}</td>
-                    <td className="py-3 px-2 text-right">
+                    <td className="py-3 px-3 text-[#4a242c] group-hover:bg-[#F6B8C2]/30 transition">
+                      {log.details}
+                    </td>
+                    <td className="py-3 px-3 text-right group-hover:bg-[#F6B8C2]/30 transition">
                       <button
                         onClick={() => handleDeleteClick(log.id)}
-                        className="px-3 py-1 bg-red-500/20 text-red-300 border border-red-500/30 rounded-xl text-xs font-bold hover:bg-red-500/30 transition"
+                        className="px-3 py-1 bg-red-500/20 text-red-700 border border-red-500/30 rounded-xl text-xs font-bold hover:bg-red-500/30 transition"
                       >
                         Delete
                       </button>
@@ -154,7 +165,10 @@ export default function ActivityLogs() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className="py-6 text-center text-purple-200/70 text-sm">
+                  <td
+                    colSpan="5"
+                    className="py-6 text-center text-[#68333e]/80 text-sm"
+                  >
                     No activity logs recorded yet.
                   </td>
                 </tr>
@@ -162,68 +176,73 @@ export default function ActivityLogs() {
             </tbody>
           </table>
         </div>
-
-       
-        {logs.length > 0 && (
-          <div className="flex flex-col sm:flex-row justify-between items-center mt-6 pt-4 border-t border-purple-900/40 text-xs text-purple-200/70 gap-4">
-            <div>
-              Showing {indexOfFirstLog + 1} to {Math.min(indexOfLastLog, logs.length)} of {logs.length} entries
-            </div>
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className={`px-3 py-1.5 rounded-xl font-bold border transition ${
-                  currentPage === 1
-                    ? "bg-purple-900/10 text-purple-400/40 border-purple-900/20 cursor-not-allowed"
-                    : "bg-purple-500/20 text-purple-300 border-purple-500/30 hover:bg-purple-500/30"
-                }`}
-              >
-                Previous
-              </button>
-              
-              <span className="px-3 py-1 bg-purple-900/40 rounded-xl font-bold text-white border border-purple-900/60">
-                Page {currentPage} of {totalPages}
-              </span>
-
-              <button
-                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-                className={`px-3 py-1.5 rounded-xl font-bold border transition ${
-                  currentPage === totalPages
-                    ? "bg-purple-900/10 text-purple-400/40 border-purple-900/20 cursor-not-allowed"
-                    : "bg-purple-500/20 text-purple-300 border-purple-500/30 hover:bg-purple-500/30"
-                }`}
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        )}
       </div>
 
-    
+     
+      {logs.length > 0 && (
+        <div className="w-[92%] max-w-7xl mx-auto mt-2 px-2 flex flex-col sm:flex-row justify-between items-center text-xs text-[#4a242c] relative z-10 gap-2">
+          <p className="text-[#68333e]/80">
+            Showing {indexOfFirstLog + 1} to{" "}
+            {Math.min(indexOfLastLog, logs.length)} of {logs.length} entries
+          </p>
+
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className={`px-3 py-1.5 rounded-xl font-bold border transition ${
+                currentPage === 1
+                  ? "bg-[#F6B8C2]/20 text-[#68333e]/40 border-[#D58C99]/20 cursor-not-allowed"
+                  : "bg-[#F6B8C2]/50 text-[#5c2d36] border-[#D58C99] hover:bg-[#F6B8C2]"
+              }`}
+            >
+              Previous
+            </button>
+
+            <span className="px-3 py-1.5 bg-[#FCD3DC] rounded-xl font-bold text-[#4a242c] border border-[#D58C99]">
+              Page {currentPage} of {totalPages}
+            </span>
+
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+              className={`px-3 py-1.5 rounded-xl font-bold border transition ${
+                currentPage === totalPages
+                  ? "bg-[#F6B8C2]/20 text-[#68333e]/40 border-[#D58C99]/20 cursor-not-allowed"
+                  : "bg-[#F6B8C2]/50 text-[#5c2d36] border-[#D58C99] hover:bg-[#F6B8C2]"
+              }`}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
+
+     
       {showConfirm &&
         ReactDOM.createPortal(
-          <div className="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-xs z-9999 px-4">
-            <div className="bg-[#28133f] p-6 rounded-3xl shadow-2xl max-w-sm w-full border border-purple-900 text-center">
-              <h3 className="text-lg font-extrabold text-white mb-2">
+          <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-xs z-9999 px-4">
+            <div className="bg-[#FCD3DC] p-6 rounded-3xl shadow-2xl max-w-sm w-full border border-white/60 text-center">
+              <h3 className="text-lg font-extrabold text-[#4a242c] mb-2">
                 Are you sure?
               </h3>
-              <p className="text-xs text-purple-200/70 mb-6">
-                Do you really want to delete this log? This action cannot be undone.
+              <p className="text-xs text-[#68333e]/80 mb-6">
+                Do you really want to delete this log? This action cannot be
+                undone.
               </p>
 
               <div className="flex justify-center space-x-3">
                 <button
                   onClick={() => setShowConfirm(false)}
-                  className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-bold transition"
+                  className="px-4 py-2 bg-[#F6B8C2]/50 hover:bg-[#F6B8C2] text-[#4a242c] rounded-xl text-xs font-bold border border-[#D58C99] transition"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={confirmDelete}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition shadow-md"
+                  className="px-4 py-2 bg-[#F45B73] hover:bg-[#E04860] text-white rounded-xl text-xs font-bold transition shadow-md"
                 >
                   Yes, Delete
                 </button>

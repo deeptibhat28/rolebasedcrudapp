@@ -135,37 +135,40 @@ function Setup2FA({ user: propUser, onUpdateUser }) {
     }
   };
 
-  return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[#1a0b2e] px-4 py-8 relative overflow-hidden">
-      <div className="bg-[#28133f] p-8 rounded-3xl shadow-2xl w-full max-w-md border border-purple-900/50 text-white">
-        <h3 className="text-lg font-bold mb-2">
+ return (
+    <div className="min-h-screen w-full flex items-center justify-center bg-[#F9B2BC] px-4 py-8 relative overflow-hidden text-[#4a242c]">
+      <div className="absolute -top-32 -left-32 w-96 h-96 bg-white/30 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#F67C8E]/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div className="bg-[#FCD3DC] backdrop-blur-md p-8 rounded-3xl shadow-2xl max-w-md w-full relative z-10 border border-white/60">
+        <h3 className="text-lg font-extrabold text-[#4a242c] mb-2">
           Two-Factor Authentication (2FA)
         </h3>
-        <p className="text-sm text-gray-600 mb-4">
+        <p className="text-sm text-[#68333e]/80 mb-4">
           Status:{" "}
-          {user.is2FAEnabled ? (
-            <span className="text-green-600 font-semibold">Enabled</span>
+          {user?.is2FAEnabled ? (
+            <span className="text-green-700 font-semibold">Enabled</span>
           ) : (
-            <span className="text-red-500 font-semibold">Disabled</span>
+            <span className="text-red-600 font-semibold">Disabled</span>
           )}
         </p>
 
-        {!user.is2FAEnabled && !isSetupOpen && (
+        {!user?.is2FAEnabled && !isSetupOpen && (
           <button
             onClick={handleStartSetup}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            className="w-full bg-[#F45B73] text-white py-2.5 rounded-xl font-bold text-sm hover:bg-[#E04860] transition shadow-md"
           >
             Set Up 2FA
           </button>
         )}
 
         {isSetupOpen && (
-          <div className="mt-4 border-t pt-4 flex flex-col items-center">
-            <p className="text-sm text-center mb-3">
+          <div className="mt-4 border-t border-[#D58C99] pt-4 flex flex-col items-center">
+            <p className="text-xs text-[#68333e]/80 text-center mb-3">
               Scan this QR Code. The code changes every 30 seconds.
             </p>
 
-            <div className="p-2 bg-white border rounded shadow mb-4">
+            <div className="p-3 bg-white border border-[#D58C99] rounded-2xl shadow-md mb-4">
               <QRCodeSVG value={otpUri} size={150} />
             </div>
 
@@ -179,11 +182,11 @@ function Setup2FA({ user: propUser, onUpdateUser }) {
                 placeholder="Enter 6-digit code"
                 value={tokenInput}
                 onChange={(e) => setTokenInput(e.target.value)}
-                className="w-40 p-2 border rounded text-center tracking-widest mb-3"
+                className="w-full px-4 py-2 bg-[#F6B8C2]/40 border border-[#D58C99] rounded-xl text-xs text-[#4a242c] placeholder-[#8C4A56] text-center tracking-widest focus:outline-none focus:ring-2 focus:ring-[#F45B73] mb-3"
               />
               <button
                 type="submit"
-                className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
+                className="w-full bg-[#F45B73] hover:bg-[#E04860] text-white py-2.5 rounded-xl text-xs font-bold transition shadow-md"
               >
                 Confirm & Enable
               </button>
@@ -194,5 +197,4 @@ function Setup2FA({ user: propUser, onUpdateUser }) {
     </div>
   );
 }
-
 export default Setup2FA;

@@ -47,12 +47,14 @@ export default function Login() {
         user={pendingUser}
         onLoginSuccess={() => {
           localStorage.setItem("user", JSON.stringify(pendingUser));
-
+          
+        if (pendingUser.role !== "admin")  {
           logActivity(
             "USER_LOGIN",
             `User ${pendingUser.username} logged into the system.`,
             pendingUser.username
           )
+        }
           toast.success("Logged in successfully!");
 
           if (pendingUser.role === "admin") {
@@ -65,32 +67,35 @@ export default function Login() {
     );
   }
 
-  return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[#1a0b2e] px-4 py-8 relative overflow-hidden">
-      <div className="absolute -top-32 -left-32 w-96 h-96 bg-purple-600/35 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
+ return (
+    <div className="min-h-screen w-full flex items-center justify-center bg-[#F9B2BC] px-4 py-8 relative overflow-hidden">
+  
+      <div className="absolute -top-32 -left-32 w-96 h-96 bg-white/30 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#F67C8E]/20 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div className="relative w-full max-w-5xl bg-[#28133f] rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row items-center justify-between p-8 md:p-16 border border-purple-900/50 z-10">
+  
+      <div className="relative w-full max-w-5xl bg-[#FCD3DC] backdrop-blur-md rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row items-center justify-between p-8 md:p-16 border border-white/60 z-10">
         <div className="w-full md:w-1/2 mb-10 md:mb-0 text-left z-10">
-          <h1 className="text-4xl md:text-6xl font-bold text-white tracking-wide mb-4">
+          <h1 className="text-4xl md:text-6xl font-extrabold text-[#4a242c] tracking-wide mb-4 drop-shadow-sm">
             Welcome!
           </h1>
 
-          <p className="text-purple-200/70 text-sm md:text-base leading-relaxed mb-8 max-w-sm">
+          <p className="text-[#68333e] text-sm md:text-base leading-relaxed mb-8 max-w-sm font-medium">
             A secure, role-based management platform designed to streamline
             administrative workflows and secure access control.
           </p>
         </div>
 
         <div className="w-full md:w-1/2 flex justify-end z-10">
-          <div className="bg-white/10 backdrop-blur-md p-8 md:p-10 rounded-2xl shadow-xl w-full max-w-md border border-white/10">
-            <h1 className="text-2xl font-bold text-white mb-6 text-center">
+         
+          <div className="bg-[#F6B8C2]/90 backdrop-blur-md p-8 md:p-10 rounded-2xl shadow-xl w-full max-w-md border border-white/50">
+            <h1 className="text-2xl font-bold text-[#4a242c] mb-6 text-center">
               Sign In
             </h1>
 
             <form onSubmit={handleLogin} className="space-y-5">
               <div className="mb-4">
-                <label className="block text-xs font-semibold text-purple-200 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-[#5c2d36] uppercase tracking-wider mb-2">
                   Username
                 </label>
                 <input
@@ -99,12 +104,12 @@ export default function Login() {
                   onChange={(e) => setUsername(e.target.value)}
                   required
                   placeholder="Enter your username"
-                  className="w-full px-4 py-3 rounded-lg bg-black/20 border border-white/10 text-white placeholder-purple-300/40 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm"
+                  className="w-full px-4 py-3 rounded-xl bg-white/60 border border-[#E899A4] text-[#4a242c] placeholder-[#945762] focus:outline-none focus:ring-2 focus:ring-[#F45B73] text-sm transition shadow-sm"
                 />
               </div>
 
               <div className="mb-6">
-                <label className="block text-xs font-semibold text-purple-200 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-[#5c2d36] uppercase tracking-wider mb-2">
                   Password
                 </label>
                 <div className="relative">
@@ -114,12 +119,12 @@ export default function Login() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     placeholder="Enter your password"
-                    className="w-full px-4 py-3 rounded-lg bg-black/20 border border-white/10 text-white placeholder-purple-300/40 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm"
+                    className="w-full px-4 py-3 rounded-xl bg-white/60 border border-[#E899A4] text-[#4a242c] placeholder-[#945762] focus:outline-none focus:ring-2 focus:ring-[#F45B73] text-sm transition shadow-sm"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-xs font-bold text-purple-300 hover:text-white"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-xs font-bold text-[#5c2d36] hover:text-[#4a242c]"
                   >
                     {showPassword ? (
                       <svg
@@ -163,17 +168,17 @@ export default function Login() {
 
               <button
                 type="submit"
-                className="w-full py-3 bg-linear-to-r from-red-500 to-orange-500 hover:opacity-95 text-white font-semibold rounded-lg transition duration-200 shadow-lg tracking-wide text-sm"
+                className="w-full py-3 bg-[#F45B73] hover:bg-[#E04860] text-white font-bold rounded-xl transition duration-200 shadow-md tracking-wide text-sm"
               >
                 Log In Securely
               </button>
             </form>
 
-            <p className="text-center text-sm text-purple-200/70 mt-6">
+            <p className="text-center text-sm text-[#5c2d36] mt-6">
               Don't have an account?{" "}
               <Link
                 to="/register"
-                className="text-white font-bold hover:underline"
+                className="text-[#4a242c] font-bold hover:underline"
               >
                 Register
               </Link>

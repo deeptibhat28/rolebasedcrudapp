@@ -163,9 +163,11 @@ export default function EditForm() {
     }
   };
 
-  return (
-    <div className="min-h-screen w-full bg-[#1a0b2e] px-4 py-8 relative overflow-hidden flex items-center justify-center text-white">
-     
+ return (
+    <div className="min-h-screen w-full bg-[#F9B2BC] px-4 py-8 relative overflow-hidden flex items-center justify-center text-[#4a242c]">
+      <div className="absolute -top-32 -left-32 w-96 h-96 bg-white/30 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#F67C8E]/20 rounded-full blur-3xl pointer-events-none"></div>
+
       <style>{`
         input:-webkit-autofill,
         input:-webkit-autofill:hover, 
@@ -173,28 +175,25 @@ export default function EditForm() {
         input:-webkit-autofill:active,
         textarea:-webkit-autofill,
         select:-webkit-autofill {
-          -webkit-box-shadow: 0 0 0 30px #28133f inset !important;
-          -webkit-text-fill-color: white !important;
-          transition: background-color 5000s ease-in-out 0s;
+          -webkit-box-shadow: 0 0 0 1000px #FCD3DC inset !important;
+          -webkit-text-fill-color: #4a242c !important;
+          transition: background-color 5000s ease-in-out 0s !important;
         }
       `}</style>
 
-      <div className="absolute -top-32 -left-32 w-96 h-96 bg-purple-600/35 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
-
-      <div className="bg-[#28133f] p-8 rounded-3xl shadow-2xl max-w-lg w-full relative z-10 my-8">
+      <div className="bg-[#FCD3DC] backdrop-blur-md p-8 rounded-3xl shadow-2xl border border-white/60 max-w-lg w-full relative z-15 my-8">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-xl font-extrabold text-white">
+            <h1 className="text-xl font-extrabold text-[#4a242c]">
               Edit Submission Form
             </h1>
-            <p className="text-xs text-purple-200/70">
+            <p className="text-xs text-[#68333e]/80">
               Update user record details
             </p>
           </div>
           <button
             onClick={() => navigate("/user-dashboard")}
-            className="text-xs font-bold text-purple-300 hover:text-white transition"
+            className="text-xs font-bold text-[#68333e] hover:text-[#4a242c] transition"
           >
             Back to Dashboard
           </button>
@@ -202,8 +201,8 @@ export default function EditForm() {
 
         <form onSubmit={handleSubmit} noValidate className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-purple-300 uppercase tracking-wider mb-1">
-              Full Name <span className="text-red-400">*</span>
+            <label className="block text-xs font-bold text-[#5c2d36] uppercase tracking-wider mb-1">
+              Full Name <span className="text-red-600">*</span>
             </label>
             <input
               type="text"
@@ -211,15 +210,16 @@ export default function EditForm() {
               value={formData.fullName}
               onChange={handleChange}
               required
+              autoComplete="new-password"
               placeholder="Only alphabets and spaces"
-              className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500"
+              className="w-full px-3 py-2 bg-[#FCD3DC] border border-[#D58C99] rounded-xl text-sm text-[#4a242c] placeholder-[#8C4A56] focus:outline-none focus:ring-2 focus:ring-[#F45B73]"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-purple-300 uppercase tracking-wider mb-1">
-                Email Address <span className="text-red-400">*</span>
+              <label className="block text-xs font-bold text-[#5c2d36] uppercase tracking-wider mb-1">
+                Email Address <span className="text-red-600">*</span>
               </label>
               <input
                 type="text"
@@ -227,13 +227,14 @@ export default function EditForm() {
                 value={formData.email}
                 onChange={handleChange}
                 required
+                autoComplete="new-password"
                 placeholder="example@gmail.com"
-                className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500"
+                className="w-full px-3 py-2 bg-[#FCD3DC] border border-[#D58C99] rounded-xl text-sm text-[#4a242c] placeholder-[#8C4A56] focus:outline-none focus:ring-2 focus:ring-[#F45B73]"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-purple-300 uppercase tracking-wider mb-1">
-                Phone Number <span className="text-red-400">*</span>
+              <label className="block text-xs font-bold text-[#5c2d36] uppercase tracking-wider mb-1">
+                Phone Number <span className="text-red-600">*</span>
               </label>
               <input
                 type="text"
@@ -241,16 +242,17 @@ export default function EditForm() {
                 value={formData.phone}
                 onChange={handleChange}
                 required
+                autoComplete="off"
                 placeholder="10 digit phone number"
-                className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500"
+                className="w-full px-3 py-2 bg-[#FCD3DC] border border-[#D58C99] rounded-xl text-sm text-[#4a242c] placeholder-[#8C4A56] focus:outline-none focus:ring-2 focus:ring-[#F45B73]"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-purple-300 uppercase tracking-wider mb-1">
-                Department <span className="text-red-400">*</span>
+              <label className="block text-xs font-bold text-[#5c2d36] uppercase tracking-wider mb-1">
+                Department <span className="text-red-600">*</span>
               </label>
               <input
                 type="text"
@@ -258,13 +260,14 @@ export default function EditForm() {
                 value={formData.department}
                 onChange={handleChange}
                 required
+                autoComplete="off"
                 placeholder="Only letters and spaces"
-                className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500"
+                className="w-full px-3 py-2 bg-[#FCD3DC] border border-[#D58C99] rounded-xl text-sm text-[#4a242c] placeholder-[#8C4A56] focus:outline-none focus:ring-2 focus:ring-[#F45B73]"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-purple-300 uppercase tracking-wider mb-1">
-                Designation <span className="text-red-400">*</span>
+              <label className="block text-xs font-bold text-[#5c2d36] uppercase tracking-wider mb-1">
+                Designation <span className="text-red-600">*</span>
               </label>
               <input
                 type="text"
@@ -272,17 +275,18 @@ export default function EditForm() {
                 value={formData.designation}
                 onChange={handleChange}
                 required
+                autoComplete="off"
                 placeholder="Only letters and spaces"
-                className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500"
+                className="w-full px-3 py-2 bg-[#FCD3DC] border border-[#D58C99] rounded-xl text-sm text-[#4a242c] placeholder-[#8C4A56] focus:outline-none focus:ring-2 focus:ring-[#F45B73]"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-purple-200 uppercase tracking-wider mb-2">
-              Gender <span className="text-red-400">*</span>
+            <label className="block text-xs font-semibold text-[#5c2d36] uppercase tracking-wider mb-2">
+              Gender <span className="text-red-600">*</span>
             </label>
-            <div className="flex items-center space-x-6 text-white text-sm pt-1">
+            <div className="flex items-center space-x-6 text-[#4a242c] text-sm pt-1">
               {["Male", "Female", "Other"].map((option) => (
                 <label
                   key={option}
@@ -295,7 +299,7 @@ export default function EditForm() {
                     checked={formData.gender === option}
                     onChange={handleChange}
                     required
-                    className="text-purple-600 focus:ring-purple-400 bg-black/20"
+                    className="text-[#F45B73] focus:ring-[#F45B73] bg-[#FCD3DC] border-[#D58C99]"
                   />
                   <span>{option}</span>
                 </label>
@@ -304,8 +308,8 @@ export default function EditForm() {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-purple-300 uppercase tracking-wider mb-1">
-              Highest Education <span className="text-red-400">*</span>
+            <label className="block text-xs font-bold text-[#5c2d36] uppercase tracking-wider mb-1">
+              Highest Education <span className="text-red-600">*</span>
             </label>
             <select
               name="education"
@@ -317,7 +321,7 @@ export default function EditForm() {
                 }
               }}
               required
-              className="w-full px-3 py-2 bg-[#1a0b2e] border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500"
+              className="w-full px-3 py-2 bg-[#FCD3DC] border border-[#D58C99] rounded-xl text-sm text-[#4a242c] focus:outline-none focus:ring-2 focus:ring-[#F45B73]"
             >
               <option value="" disabled>Select Education</option>
               <option value="HSC">HSC</option>
@@ -331,8 +335,8 @@ export default function EditForm() {
 
           {formData.education === "Other" && (
             <div>
-              <label className="block text-xs font-bold text-purple-300 uppercase tracking-wider mb-1">
-                Custom Education <span className="text-red-400">*</span>
+              <label className="block text-xs font-bold text-[#5c2d36] uppercase tracking-wider mb-1">
+                Custom Education <span className="text-red-600">*</span>
               </label>
               <input
                 type="text"
@@ -341,16 +345,17 @@ export default function EditForm() {
                 onChange={handleChange}
                 placeholder="Please specify education"
                 required
-                className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500"
+                autoComplete="off"
+                className="w-full px-3 py-2 bg-[#FCD3DC] border border-[#D58C99] rounded-xl text-sm text-[#4a242c] placeholder-[#8C4A56] focus:outline-none focus:ring-2 focus:ring-[#F45B73]"
               />
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-bold text-purple-300 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-bold text-[#5c2d36] uppercase tracking-wider mb-2">
               Skills
             </label>
-            <div className="grid grid-cols-2 gap-2 bg-black/20 border border-white/10 p-3 rounded-xl">
+            <div className="grid grid-cols-2 gap-2 bg-[#F6B8C2]/40 border border-[#D58C99] p-3 rounded-xl">
               {[
                 "React.js",
                 "Node.js",
@@ -370,7 +375,7 @@ export default function EditForm() {
                 return (
                   <label
                     key={skill}
-                    className="flex items-center space-x-2 text-sm text-white cursor-pointer select-none"
+                    className="flex items-center space-x-2 text-sm text-[#4a242c] cursor-pointer select-none"
                   >
                     <input
                       type="checkbox"
@@ -382,7 +387,7 @@ export default function EditForm() {
                           updatedSkills.push(skill);
                         } else {
                           updatedSkills = updatedSkills.filter(
-                            (s) => s !== skill,
+                            (s) => s !== skill
                           );
                         }
                         setFormData((prev) => ({
@@ -390,7 +395,7 @@ export default function EditForm() {
                           skills: updatedSkills,
                         }));
                       }}
-                      className="rounded bg-black/40 border-white/20 text-purple-600 focus:ring-purple-500 w-4 h-4"
+                      className="rounded bg-[#FCD3DC] border-[#D58C99] text-[#F45B73] focus:ring-[#F45B73] w-4 h-4"
                     />
                     <span>{skill}</span>
                   </label>
@@ -400,8 +405,8 @@ export default function EditForm() {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-purple-300 uppercase tracking-wider mb-1">
-              Address <span className="text-red-400">*</span>
+            <label className="block text-xs font-bold text-[#5c2d36] uppercase tracking-wider mb-1">
+              Address <span className="text-red-600">*</span>
             </label>
             <textarea
               name="address"
@@ -409,13 +414,14 @@ export default function EditForm() {
               onChange={handleChange}
               rows="2"
               required
+              autoComplete="off"
               placeholder="Enter address..."
-              className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500"
+              className="w-full px-3 py-2 bg-[#FCD3DC] border border-[#D58C99] rounded-xl text-sm text-[#4a242c] placeholder-[#8C4A56] focus:outline-none focus:ring-2 focus:ring-[#F45B73]"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-purple-300 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-bold text-[#5c2d36] uppercase tracking-wider mb-1">
               Description
             </label>
             <textarea
@@ -423,29 +429,30 @@ export default function EditForm() {
               value={formData.description}
               onChange={handleChange}
               rows="2"
+              autoComplete="off"
               placeholder="Enter description..."
-              className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500"
+              className="w-full px-3 py-2 bg-[#FCD3DC] border border-[#D58C99] rounded-xl text-sm text-[#4a242c] placeholder-[#8C4A56] focus:outline-none focus:ring-2 focus:ring-[#F45B73]"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-purple-300 uppercase tracking-wider mb-1">
-              Date of Submission <span className="text-red-400">*</span>
+            <label className="block text-xs font-bold text-[#5c2d36] uppercase tracking-wider mb-1">
+              Date of Submission <span className="text-red-600">*</span>
             </label>
             <input
               type="date"
               name="dateOfSubmission"
               value={formData.dateOfSubmission}
               readOnly
-              className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-sm text-purple-300 cursor-not-allowed focus:outline-none"
+              className="w-full px-3 py-2 bg-[#F6B8C2]/50 border border-[#D58C99] rounded-xl text-sm text-[#68333e] cursor-not-allowed focus:outline-none"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-3 bg-linear-to-r from-red-500 to-orange-500 text-white rounded-2xl font-bold text-sm transition shadow-lg mt-2 flex items-center justify-center space-x-2 ${
-              loading ? "opacity-75 cursor-not-allowed" : "hover:opacity-95"
+            className={`w-full py-3 bg-[#F45B73] hover:bg-[#E04860] text-white rounded-2xl font-bold text-sm transition shadow-md mt-2 flex items-center justify-center space-x-2 ${
+              loading ? "opacity-75 cursor-not-allowed" : ""
             }`}
           >
             {loading ? (
