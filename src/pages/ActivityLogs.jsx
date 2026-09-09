@@ -36,7 +36,6 @@ export default function ActivityLogs() {
     };
   }, []);
 
-  // Filter out admin logs entirely
   const actualLogs = logs.filter((item) => {
     if (!item.action) return false;
     const isAdmin =
@@ -170,7 +169,7 @@ export default function ActivityLogs() {
 
   return (
     <div
-      className="min-h-screen w-full bg-[#240b3b] px-6 py-8 relative overflow-hidden text-white font-sans"
+      className="min-h-screen w-full bg-[#240b3b] px-4 sm:px-6 py-6 sm:py-8 relative overflow-hidden text-white font-sans"
       style={{
         backgroundImage:
           "radial-gradient(circle at 20% 30%, rgba(105, 30, 150, 0.45) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(190, 40, 110, 0.35) 0%, transparent 50%), #240b3b",
@@ -179,45 +178,45 @@ export default function ActivityLogs() {
       <div className="absolute -top-32 -left-32 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-pink-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center bg-[#2e1048]/95 backdrop-blur-md p-6 rounded-3xl shadow-2xl mb-6 border border-purple-500/30 relative z-10">
-        <div className="mb-4 md:mb-0">
-          <h1 className="text-2xl font-extrabold text-white tracking-wide">
+      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#2e1048]/95 backdrop-blur-md p-5 sm:p-6 rounded-3xl shadow-2xl mb-6 border border-purple-500/30 relative z-10 gap-4">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-wide">
             System Activity Logs
           </h1>
-          <p className="text-sm text-purple-300/80 mt-0.5">
+          <p className="text-xs sm:text-sm text-purple-300/80 mt-0.5">
             Track critical security events and administrative actions in real time.
           </p>
         </div>
-        <div className="space-x-3 flex items-center">
+        <div className="flex items-center space-x-2 sm:space-x-3 w-full sm:w-auto justify-end">
           <button
             onClick={() => navigate("/admin-dashboard")}
-            className="px-4 py-2.5 bg-[#1b082d]/70 text-purple-200 border border-purple-500/40 rounded-xl font-bold text-sm hover:bg-[#1b082d] transition duration-200 shadow-md"
+            className="px-4 py-2 bg-[#1b082d]/70 text-purple-200 border border-purple-500/45 rounded-xl font-bold text-xs sm:text-sm hover:bg-[#1b082d] transition duration-200 shadow-md"
           >
             Dashboard
           </button>
           <button
             onClick={handleLogout}
-            className="px-4 py-2.5 bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl font-bold text-sm hover:bg-red-500/30 transition duration-200"
+            className="px-4 py-2 bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl font-bold text-xs sm:text-sm hover:bg-red-500/30 transition duration-200"
           >
             Logout
           </button>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto bg-[#2e1048]/95 backdrop-blur-md p-6 rounded-3xl shadow-2xl border border-purple-500/30 relative z-10">
+
+      <div className="max-w-7xl mx-auto bg-[#2e1048]/95 backdrop-blur-md p-4 sm:p-6 rounded-3xl shadow-2xl border border-purple-500/30 relative z-10">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
           <div>
-            <h2 className="text-lg font-bold text-white">Activity Records</h2>
+            <h2 className="text-base sm:text-lg font-bold text-white">Activity Records</h2>
             <p className="text-xs text-purple-300/80">
               Showing log entries history
             </p>
           </div>
-          <div className="flex items-center space-x-3 flex-wrap gap-y-2">
+          <div className="flex items-center space-x-2 sm:space-x-3 flex-wrap gap-y-2 w-full sm:w-auto">
             <span className="px-3 py-1.5 bg-[#1b082d]/70 text-purple-300 border border-purple-500/40 rounded-xl text-xs font-bold whitespace-nowrap shadow-inner">
               Total Logs: {actualLogs.length}
             </span>
 
-            {/* Dynamic Multi-Select / Delete Button */}
             <button
               onClick={handleMainButtonClick}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition duration-200 shadow-md border ${
@@ -229,7 +228,7 @@ export default function ActivityLogs() {
               }`}
             >
               {!isSelectMode
-                ? "Multi-Select"
+                ? "Select All"
                 : selectedLogs.length > 0
                 ? `Delete Selected (${selectedLogs.length})`
                 : "Cancel Selection"}
@@ -244,7 +243,7 @@ export default function ActivityLogs() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-purple-500/30 text-xs font-bold text-purple-300 uppercase tracking-wider">
@@ -299,7 +298,7 @@ export default function ActivityLogs() {
                           {log.action}
                         </span>
                       </td>
-                      <td className="py-3 px-3 text-purple-100">
+                      <td className="py-3 px-3 text-purple-100 wrap-break-word max-w-xs">
                         {log.details}
                       </td>
                       <td className="py-3 px-3 text-right">
@@ -326,12 +325,71 @@ export default function ActivityLogs() {
             </tbody>
           </table>
         </div>
+
+
+        <div className="block md:hidden space-y-3">
+          {currentLogs.length > 0 ? (
+            currentLogs.map((log) => {
+              const isChecked = selectedLogs.includes(log.id);
+              return (
+                <div
+                  key={log.id}
+                  className={`p-4 rounded-2xl border transition shadow-inner ${
+                    isChecked
+                      ? "bg-purple-900/40 border-purple-400"
+                      : "bg-[#1b082d]/70 border-purple-500/40"
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-2">
+                      {isSelectMode && (
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => handleCheckboxChange(log.id)}
+                          className="w-4 h-4 rounded-md border-purple-400/50 bg-[#1b082d] text-orange-500 accent-orange-500 cursor-pointer"
+                        />
+                      )}
+                      <span className="text-xs text-purple-300/80">
+                        {log.timestamp}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteClick(log.id)}
+                      className="px-2.5 py-1 bg-red-500/20 text-red-300 border border-red-500/30 rounded-lg text-xs font-bold hover:bg-red-500/30"
+                    >
+                      Delete
+                    </button>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    <span className="px-2 py-0.5 bg-linear-to-r from-orange-500 to-pink-600 text-white rounded-md text-xs font-bold">
+                      {log.actor}
+                    </span>
+                    <span className="px-2 py-0.5 bg-[#1b082d] text-purple-200 border border-purple-500/40 rounded-md text-xs font-mono font-bold">
+                      {log.action}
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-purple-100 wrap-break-word">
+                    <span className="font-semibold text-purple-300/80">Details: </span>
+                    {log.details}
+                  </p>
+                </div>
+              );
+            })
+          ) : (
+            <div className="py-6 text-center text-purple-300/80 text-sm bg-[#1b082d]/50 rounded-2xl border border-purple-500/20">
+              No activity logs recorded yet.
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Pagination Controls */}
       {actualLogs.length > 0 && (
-        <div className="max-w-7xl mx-auto mt-4 px-2 flex flex-col sm:flex-row justify-between items-center text-xs text-white relative z-10 gap-2">
-          <p className="text-purple-300/80">
+        <div className="max-w-7xl mx-auto mt-4 px-2 flex flex-col sm:flex-row justify-between items-center text-xs text-white relative z-10 gap-3">
+          <p className="text-purple-300/80 text-center sm:text-left">
             Showing {indexOfFirstLog + 1} to{" "}
             {Math.min(indexOfLastLog, actualLogs.length)} of {actualLogs.length} entries
           </p>

@@ -16,6 +16,8 @@ export default function CreateForm() {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
+    countryCode: "+91",
+    customCountryCode: "",
     phone: "",
     gender: "",
     education: "",
@@ -35,6 +37,13 @@ export default function CreateForm() {
       if (value !== "" && !/^[A-Za-z\s]*$/.test(value)) {
         return;
       }
+    }
+
+    // Strictly enforce 10 digits only for the phone field
+    if (name === "phone") {
+      const numericValue = value.replace(/\D/g, "").slice(0, 10);
+      setFormData({ ...formData, phone: numericValue });
+      return;
     }
 
     setFormData({ ...formData, [name]: value });
@@ -73,36 +82,23 @@ export default function CreateForm() {
       return;
     }
 
-    const phoneValue = formData.phone.trim();
-
-    if (/[a-zA-Z]/.test(phoneValue)) {
-      toast.warn("Phone number cannot contain alphabetic characters.");
+    if (formData.phone.length !== 10) {
+      toast.warn("Phone number must be strictly 10 digits.");
       return;
     }
 
-    if (/[()\[\]{}]/.test(phoneValue)) {
-      toast.warn("Brackets are not allowed in the phone number.");
-      return;
-    }
-
-    const rawDigits = phoneValue.replace(/[^0-9]/g, "");
-
-    if (/^(\d)\1+$/.test(rawDigits)) {
+    if (/^(\d)\1+$/.test(formData.phone)) {
       toast.warn("Please enter a valid phone number, not repeated digits.");
       return;
     }
 
-    if (rawDigits.length < 10 || rawDigits.length > 15) {
-      toast.warn("Please enter a valid phone number.");
-      return;
-    }
+    const activeCountryCode =
+      formData.countryCode === "Other"
+        ? formData.customCountryCode.trim()
+        : formData.countryCode;
 
-    const strictCountryCodeFormatRegex = /^\+?[1-9]\d{0,2}[-\s]?\d{7,12}$/;
-
-    if (!strictCountryCodeFormatRegex.test(phoneValue)) {
-      toast.warn(
-        "Hyphens or spaces are only allowed immediately after the country code.",
-      );
+    if (formData.countryCode === "Other" && !activeCountryCode) {
+      toast.warn("Please specify your custom country code.");
       return;
     }
 
@@ -124,8 +120,11 @@ export default function CreateForm() {
         ? formData.skills.join(", ")
         : formData.skills;
 
+      const fullPhoneNumber = `${activeCountryCode} ${formData.phone}`;
+
       const newRecord = {
         ...formData,
+        phone: fullPhoneNumber,
         education: finalEducation,
         skills: formattedSkills,
         userId: currentUser.id,
@@ -151,14 +150,14 @@ export default function CreateForm() {
 
   return (
     <div
-      className="min-h-screen w-full bg-[#240b3b] px-6 py-8 relative overflow-hidden text-white font-sans"
+      className="min-h-screen w-full bg-[#240b3b] px-4 sm:px-6 py-6 md:py-10 relative overflow-hidden text-white font-sans"
       style={{
         backgroundImage:
           "radial-gradient(circle at 20% 30%, rgba(105, 30, 150, 0.45) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(190, 40, 110, 0.35) 0%, transparent 50%), #240b3b",
       }}
     >
-      <div className="absolute -top-32 -left-32 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-pink-600/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute -top-32 -left-32 w-72 h-72 md:w-96 md:h-96 bg-purple-600/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute -bottom-32 -right-32 w-72 h-72 md:w-96 md:h-96 bg-pink-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
       <style>{`
         input:-webkit-autofill,
@@ -173,28 +172,26 @@ export default function CreateForm() {
         }
       `}</style>
 
-      {/* Full-Width Header Panel */}
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center bg-[#2e1048]/95 backdrop-blur-md p-6 rounded-3xl shadow-2xl mb-6 border border-purple-500/30 relative z-10">
-        <div className="mb-4 md:mb-0">
-          <h1 className="text-2xl font-extrabold text-white tracking-wide">
+      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#2e1048]/95 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-2xl mb-6 border border-purple-500/30 relative z-10 gap-4">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-wide">
             New Submission Form
           </h1>
-          <p className="text-sm text-purple-300/80 mt-0.5">
+          <p className="text-xs sm:text-sm text-purple-300/80 mt-0.5">
             Fill out user record information accurately
           </p>
         </div>
         <div>
           <button
             onClick={() => navigate("/user-dashboard")}
-            className="px-4 py-2.5 bg-[#1b082d]/70 text-purple-200 border border-purple-500/40 rounded-xl font-bold text-sm hover:bg-[#1b082d] transition duration-200 shadow-md"
+            className="w-full sm:w-auto px-4 py-2.5 bg-[#1b082d]/70 text-purple-200 border border-purple-500/40 rounded-xl font-bold text-xs sm:text-sm hover:bg-[#1b082d] transition duration-200 shadow-md cursor-pointer text-center"
           >
             ← Back to Dashboard
           </button>
         </div>
       </div>
 
-      {/* Full-Width Content Container */}
-      <div className="max-w-7xl mx-auto bg-[#2e1048]/95 backdrop-blur-md p-8 rounded-3xl shadow-2xl border border-purple-500/30 relative z-10">
+      <div className="max-w-7xl mx-auto bg-[#2e1048]/95 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-2xl border border-purple-500/30 relative z-10">
         <form onSubmit={handleSubmit} noValidate className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
           
           {/* Full Name */}
@@ -231,21 +228,56 @@ export default function CreateForm() {
             />
           </div>
 
-          {/* Phone Number */}
+          {/* Phone Number with Country Code Dropdown */}
           <div className="bg-[#1b082d]/70 p-4 rounded-2xl border border-purple-500/40 shadow-inner">
             <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-1">
               Phone Number <span className="text-red-400">*</span>
             </label>
-            <input
-              type="text"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              required
-              autoComplete="off"
-              placeholder="Enter phone number"
-              className="w-full px-4 py-3 bg-[#240b3b] border border-purple-500/40 rounded-xl text-sm text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner"
-            />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <select
+                name="countryCode"
+                value={formData.countryCode}
+                onChange={(e) => {
+                  handleChange(e);
+                  if (e.target.value !== "Other") {
+                    setFormData((prev) => ({ ...prev, customCountryCode: "" }));
+                  }
+                }}
+                className="px-3 py-3 bg-[#240b3b] border border-purple-500/40 rounded-xl text-sm text-white focus:outline-none focus:border-orange-500 transition shadow-inner [&>option]:bg-[#240b3b] [&>option]:text-white"
+              >
+                <option value="+91">+91 (India)</option>
+                <option value="+1">+1 (USA/Canada)</option>
+                <option value="+44">+44 (UK)</option>
+                <option value="+61">+61 (Australia)</option>
+                <option value="+81">+81 (Japan)</option>
+                <option value="Other">Other</option>
+              </select>
+
+              {formData.countryCode === "Other" && (
+                <input
+                  type="text"
+                  name="customCountryCode"
+                  value={formData.customCountryCode}
+                  onChange={handleChange}
+                  placeholder="+Code"
+                  maxLength={5}
+                  className="px-3 py-3 bg-[#240b3b] border border-purple-500/40 rounded-xl text-sm text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner"
+                />
+              )}
+
+              <input
+                type="text"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                required
+                autoComplete="new-password"
+                maxLength={10}
+                placeholder="10-digit number"
+                className={`${formData.countryCode === "Other" ? "sm:col-span-1" : "sm:col-span-2"} w-full px-4 py-3 bg-[#240b3b] border border-purple-500/40 rounded-xl text-sm text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner`}
+              />
+            </div>
+            
           </div>
 
           {/* Department */}
@@ -287,7 +319,7 @@ export default function CreateForm() {
             <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-2">
               Gender <span className="text-red-400">*</span>
             </label>
-            <div className="flex items-center space-x-6 text-purple-100 text-sm pt-2">
+            <div className="flex flex-wrap items-center gap-4 sm:space-x-6 text-purple-100 text-sm pt-2">
               {["Male", "Female", "Other"].map((option) => (
                 <label
                   key={option}
@@ -459,7 +491,7 @@ export default function CreateForm() {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-3.5 bg-linear-to-r from-orange-500 to-pink-600 hover:opacity-95 text-white font-bold rounded-xl transition duration-150 shadow-lg text-sm tracking-widest uppercase flex items-center justify-center space-x-2 ${
+              className={`w-full py-3.5 bg-linear-to-r from-orange-500 to-pink-600 hover:opacity-95 text-white font-bold rounded-xl transition duration-150 shadow-lg text-sm tracking-widest uppercase flex items-center justify-center space-x-2 cursor-pointer ${
                 loading ? "opacity-75 cursor-not-allowed" : ""
               }`}
             >

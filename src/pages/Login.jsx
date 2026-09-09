@@ -72,38 +72,34 @@ export default function Login() {
 
   return (
     <div 
-      className="min-h-screen w-full flex items-center justify-center bg-[#240b3b] font-sans relative overflow-hidden m-0 p-0"
+      className="min-h-screen w-full flex items-center justify-center bg-[#240b3b] font-sans relative overflow-hidden m-0 p-6 md:p-12"
       style={{ backgroundImage: "radial-gradient(circle at 20% 30%, rgba(105, 30, 150, 0.45) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(190, 40, 110, 0.35) 0%, transparent 50%), #240b3b" }}
     >
-      
-    
-      <div className="w-full h-screen flex items-center justify-between relative">
+      <div className="w-full max-w-6xl mx-auto flex items-center justify-center lg:justify-between relative z-10">
 
-        
-        <div className="w-full h-full bg-[#240b3b] px-8 md:px-24 flex flex-col justify-center text-white relative z-10">
-          <div className="flex space-x-1.5 mb-5">
-            <div className="w-3.5 h-3.5 bg-white rounded-sm"></div>
-            <div className="w-3.5 h-3.5 bg-white/60 rounded-sm"></div>
+        <div className="hidden lg:flex flex-col justify-center text-white max-w-xl pr-8">
+          <div className="flex space-x-1.5 mb-6">
+            <div className="w-4 h-4 bg-white rounded-sm"></div>
+            <div className="w-4 h-4 bg-white/60 rounded-sm"></div>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-3 text-white">
+          <h1 className="text-6xl lg:text-7xl font-extrabold tracking-tight mb-4 text-white">
             Welcome!
           </h1>
-          <div className="w-16 h-1 bg-orange-500 rounded-full mb-6"></div>
-          <p className="text-purple-200/80 text-sm md:text-lg leading-relaxed max-w-lg">
+          <div className="w-20 h-1.5 bg-orange-500 rounded-full mb-6"></div>
+          <p className="text-purple-200/90 text-lg lg:text-xl leading-relaxed">
             A secure, role-based management platform designed to streamline administrative workflows and secure access control.
           </p>
         </div>
 
-        
-        <div className="absolute right-6 md:right-90 w-[320px] md:w-100 bg-[#2e1048]/95 backdrop-blur-md p-6 md:p-8 rounded-3xl border border-purple-500/30 shadow-2xl z-20">
-          <h2 className="text-xl font-bold text-white text-center mb-6 tracking-wide">
+        <div className="w-full sm:w-105 lg:w-115 bg-[#2e1048]/95 backdrop-blur-md p-8 md:p-10 rounded-3xl border border-purple-500/30 shadow-2xl">
+          <h2 className="text-2xl font-bold text-white text-center mb-8 tracking-wide">
             LOG IN
           </h2>
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-5">
             <div>
-              <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-1.5">
+              <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-2">
                 User Name
               </label>
               <input
@@ -112,12 +108,12 @@ export default function Login() {
                 onChange={(e) => setUsername(e.target.value)}
                 required
                 placeholder="Username"
-                className="w-full px-4 py-3 rounded-full bg-[#1b082d] border border-purple-500/40 text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 text-sm transition shadow-inner"
+                className="w-full px-5 py-3.5 rounded-full bg-[#1b082d] border border-purple-500/40 text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 text-sm transition shadow-inner"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-1.5">
+              <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-2">
                 Password
               </label>
               <div className="relative">
@@ -127,7 +123,7 @@ export default function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   placeholder="••••••••••••"
-                  className="w-full px-4 py-3 pr-12 rounded-full bg-[#1b082d] border border-purple-500/40 text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 text-sm transition shadow-inner"
+                  className="w-full px-5 py-3.5 pr-12 rounded-full bg-[#1b082d] border border-purple-500/40 text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 text-sm transition shadow-inner"
                 />
                 <button
                   type="button"
@@ -150,13 +146,13 @@ export default function Login() {
 
             <button
               type="submit"
-              className="w-full mt-4 py-3 bg-linear-to-r from-orange-500 to-pink-600 hover:opacity-95 text-white font-bold rounded-full transition duration-150 shadow-lg text-sm tracking-widest uppercase"
+              className="w-full mt-2 py-3.5 bg-linear-to-r from-orange-500 to-pink-600 hover:opacity-95 text-white font-bold rounded-full transition duration-150 shadow-lg text-sm tracking-widest uppercase"
             >
               SIGN IN
             </button>
           </form>
 
-          <div className="text-center mt-5">
+          <div className="text-center mt-6">
             <p className="text-xs text-purple-300/70">
               Don't have an account?{" "}
               <Link to="/register" className="text-orange-400 font-bold hover:underline">
