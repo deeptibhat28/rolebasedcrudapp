@@ -61,7 +61,11 @@ export default function Register() {
 
       const response = await registerUser(newUser);
       if (response) {
-        logActivity("USER_REGISTER", `New user registered: ${username} (${role})`, username);
+        // Only log activity if the registered user is NOT an admin
+        if (role !== "admin") {
+          logActivity("USER_REGISTER", `New user registered: ${username} (${role})`, username);
+        }
+
         setQrCodeUrl(qrDataUrl);
         setIsRegistered(true);
         toast.success(
@@ -99,7 +103,7 @@ export default function Register() {
 
           <button
             onClick={() => navigate("/")}
-            className="w-full py-3 bg-gradient-to-r from-orange-500 to-pink-600 hover:opacity-95 text-white font-bold rounded-xl transition duration-200 shadow-lg tracking-wider text-sm uppercase"
+            className="w-full py-3 bg-linear-to-r from-orange-500 to-pink-600 hover:opacity-95 text-white font-bold rounded-xl transition duration-200 shadow-lg tracking-wider text-sm uppercase"
           >
             I've Scanned It, Go to Sign In
           </button>
@@ -117,7 +121,7 @@ export default function Register() {
       {/* Full-Screen Edge-to-Edge Wrapper Container */}
       <div className="w-full h-screen flex items-center justify-between relative">
 
-        {/* Left Welcome Section (Takes full width and height of the background screen) */}
+        {/* Left Welcome Section */}
         <div className="w-full h-full bg-transparent px-8 md:px-24 flex flex-col justify-center text-white relative z-10">
           <div className="flex space-x-1.5 mb-5">
             <div className="w-3.5 h-3.5 bg-white rounded-sm"></div>
@@ -202,7 +206,7 @@ export default function Register() {
 
             <button
               type="submit"
-              className="w-full mt-4 py-3 bg-gradient-to-r from-orange-500 to-pink-600 hover:opacity-95 text-white font-bold rounded-full transition duration-150 shadow-lg text-sm tracking-widest uppercase"
+              className="w-full mt-4 py-3 bg-linear-to-r from-orange-500 to-pink-600 hover:opacity-95 text-white font-bold rounded-full transition duration-150 shadow-lg text-sm tracking-widest uppercase"
             >
               Register Now
             </button>

@@ -14,7 +14,6 @@ export default function ActivityLogs() {
   const [currentPage, setCurrentPage] = useState(1);
   const logsPerPage = 5;
 
-  
   const loadLogs = async () => {
     try {
       const response = await fetch(API_URL);
@@ -54,7 +53,15 @@ export default function ActivityLogs() {
       setShowConfirm(false);
       setDeleteLogId(null);
 
-      const totalPagesAfterDelete = Math.ceil(updatedLogs.filter(item => item.action).length / logsPerPage);
+      const totalPagesAfterDelete = Math.ceil(
+        updatedLogs.filter((item) => {
+          if (!item.action) return false;
+          const isAdmin =
+            item.actor?.toLowerCase() === "admin" ||
+            item.details?.toLowerCase().includes("(admin)");
+          return !isAdmin;
+        }).length / logsPerPage
+      );
       if (currentPage > totalPagesAfterDelete && totalPagesAfterDelete > 0) {
         setCurrentPage(totalPagesAfterDelete);
       }
@@ -68,8 +75,13 @@ export default function ActivityLogs() {
 
   const handleClearLogs = async () => {
     try {
-     
-      const logsOnly = logs.filter((log) => log.action);
+      const logsOnly = logs.filter((log) => {
+        if (!log.action) return false;
+        const isAdmin =
+          log.actor?.toLowerCase() === "admin" ||
+          log.details?.toLowerCase().includes("(admin)");
+        return !isAdmin;
+      });
 
       await Promise.all(
         logsOnly.map((log) =>
@@ -77,8 +89,13 @@ export default function ActivityLogs() {
         )
       );
 
-      
-      const remainingSubmissions = logs.filter((log) => !log.action);
+      const remainingSubmissions = logs.filter((log) => {
+        if (!log.action) return true;
+        const isAdmin =
+          log.actor?.toLowerCase() === "admin" ||
+          log.details?.toLowerCase().includes("(admin)");
+        return isAdmin;
+      });
       setLogs(remainingSubmissions);
       setCurrentPage(1);
       toast.success("Activity logs cleared successfully!");
@@ -94,8 +111,14 @@ export default function ActivityLogs() {
     navigate("/login");
   };
 
-
-  const actualLogs = logs.filter((item) => item.action);
+  // Filter out admin logs entirely so only user logs show up
+  const actualLogs = logs.filter((item) => {
+    if (!item.action) return false;
+    const isAdmin =
+      item.actor?.toLowerCase() === "admin" ||
+      item.details?.toLowerCase().includes("(admin)");
+    return !isAdmin;
+  });
 
   const indexOfLastLog = currentPage * logsPerPage;
   const indexOfFirstLog = indexOfLastLog - logsPerPage;
