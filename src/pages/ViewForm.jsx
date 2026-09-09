@@ -65,12 +65,10 @@ export default function ViewForm() {
         </div>
       </div>
 
-      {/* Full-Width Content Container */}
       <div className="max-w-7xl mx-auto bg-[#2e1048]/95 backdrop-blur-md p-8 rounded-3xl shadow-2xl border border-purple-500/30 relative z-10">
         {submission ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
-            
-            {/* Full Name (Spans Full Width) */}
+
             <div className="md:col-span-2 bg-[#1b082d]/70 p-5 rounded-2xl border border-purple-500/40 shadow-inner flex justify-between items-center">
               <div>
                 <span className="text-xs font-semibold text-purple-300/80 uppercase tracking-widest block mb-1">
@@ -78,7 +76,7 @@ export default function ViewForm() {
                 </span>
                 <p className="text-lg font-bold text-white">{submission.fullName}</p>
               </div>
-              <span className="px-3 py-1 bg-gradient-to-r from-orange-500 to-pink-600 text-white rounded-xl text-xs font-bold shadow-sm">
+              <span className="px-3 py-1 bg-linear-to-r from-orange-500 to-pink-600 text-white rounded-xl text-xs font-bold shadow-sm">
                 Verified Record
               </span>
             </div>

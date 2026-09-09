@@ -96,7 +96,7 @@ export default function Login() {
         </div>
 
         
-        <div className="absolute right-6 md:right-90 w-[320px] md:w-[400px] bg-[#2e1048]/95 backdrop-blur-md p-6 md:p-8 rounded-3xl border border-purple-500/30 shadow-2xl z-20">
+        <div className="absolute right-6 md:right-90 w-[320px] md:w-100 bg-[#2e1048]/95 backdrop-blur-md p-6 md:p-8 rounded-3xl border border-purple-500/30 shadow-2xl z-20">
           <h2 className="text-xl font-bold text-white text-center mb-6 tracking-wide">
             LOG IN
           </h2>

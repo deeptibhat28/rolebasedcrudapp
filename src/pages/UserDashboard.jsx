@@ -93,7 +93,6 @@ export default function UserDashboard() {
       style={{ backgroundImage: "radial-gradient(circle at 20% 30%, rgba(105, 30, 150, 0.45) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(190, 40, 110, 0.35) 0%, transparent 50%), #240b3b" }}
     >
       
-      {/* Background Lighting Effects */}
       <div className="absolute -top-32 -left-32 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-pink-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -103,7 +102,6 @@ export default function UserDashboard() {
         }`}
       >
         
-        {/* Top Header Card */}
         <div className="w-[92%] max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center bg-[#2e1048]/95 backdrop-blur-md p-6 rounded-3xl shadow-2xl mb-6 border border-purple-500/30 z-10 relative">
           <div className="mb-4 md:mb-0">
             <h1 className="text-2xl font-extrabold text-white tracking-wide">
@@ -132,7 +130,6 @@ export default function UserDashboard() {
           </div>
         </div>
 
-        {/* Submissions Table Section */}
         <div className="w-[92%] max-w-7xl mx-auto bg-[#2e1048]/95 backdrop-blur-md p-6 rounded-3xl shadow-2xl border border-purple-500/30 z-10 relative">
           <h2 className="text-lg font-bold text-white mb-4 tracking-wide">
             My Submissions
@@ -209,7 +206,6 @@ export default function UserDashboard() {
         </div>
       </div>
 
-      {/* Confirmation Modal */}
       {showConfirm && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50 px-4">
           <div className="bg-[#2e1048] backdrop-blur-md p-6 rounded-3xl shadow-2xl max-w-sm w-full border border-purple-500/40 text-center">
@@ -229,7 +225,7 @@ export default function UserDashboard() {
               </button>
               <button
                 onClick={confirmDelete}
-                className="px-4 py-2 bg-gradient-to-r from-orange-500 to-pink-600 hover:opacity-95 text-white rounded-xl text-xs font-bold transition shadow-lg tracking-wider"
+                className="px-4 py-2 bg-linear-to-r from-orange-500 to-pink-600 hover:opacity-95 text-white rounded-xl text-xs font-bold transition shadow-lg tracking-wider"
               >
                 Yes, Delete
               </button>

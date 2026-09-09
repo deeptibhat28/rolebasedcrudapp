@@ -117,11 +117,9 @@ export default function Register() {
       className="min-h-screen w-full flex items-center justify-center bg-[#240b3b] font-sans relative overflow-hidden m-0 p-0"
       style={{ backgroundImage: "radial-gradient(circle at 20% 30%, rgba(105, 30, 150, 0.45) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(190, 40, 110, 0.35) 0%, transparent 50%), #240b3b" }}
     >
-      
-      {/* Full-Screen Edge-to-Edge Wrapper Container */}
+
       <div className="w-full h-screen flex items-center justify-between relative">
 
-        {/* Left Welcome Section */}
         <div className="w-full h-full bg-transparent px-8 md:px-24 flex flex-col justify-center text-white relative z-10">
           <div className="flex space-x-1.5 mb-5">
             <div className="w-3.5 h-3.5 bg-white rounded-sm"></div>
@@ -137,8 +135,7 @@ export default function Register() {
           </p>
         </div>
 
-        {/* Floating Create Account Card Docked on the Right Edge */}
-        <div className="absolute right-6 md:right-90 w-[320px] md:w-[400px] bg-[#2e1048]/95 backdrop-blur-md p-6 md:p-8 rounded-3xl border border-purple-500/30 shadow-2xl z-20">
+        <div className="absolute right-6 md:right-90 w-[320px] md:w-100 bg-[#2e1048]/95 backdrop-blur-md p-6 md:p-8 rounded-3xl border border-purple-500/30 shadow-2xl z-20">
           <h2 className="text-xl font-bold text-white text-center mb-6 tracking-wide">
             CREATE ACCOUNT
           </h2>

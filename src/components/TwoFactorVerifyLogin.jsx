@@ -61,7 +61,7 @@ function TwoFactorVerifyLogin({ user, username, onLoginSuccess }) {
 
         <button
           type="submit"
-          className="w-full py-3 bg-gradient-to-r from-orange-500 to-pink-600 hover:opacity-95 text-white font-bold rounded-full transition duration-150 shadow-lg text-sm tracking-widest uppercase"
+          className="w-full py-3 bg-linear-to-r from-orange-500 to-pink-600 hover:opacity-95 text-white font-bold rounded-full transition duration-150 shadow-lg text-sm tracking-widest uppercase"
         >
           Verify & Login
         </button>
