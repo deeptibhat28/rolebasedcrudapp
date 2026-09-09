@@ -1,5 +1,6 @@
-export const logActivity = (actionType, details, actorName = "System") => {
+const API_URL = "https://6a90168dff2484963a5db61a.mockapi.io/activity-logs";
 
+export const logActivity = async (actionType, details, actorName = "System") => {
     const now = new Date();
     const day = String(now.getDate()).padStart(2, '0');
     const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -8,18 +9,29 @@ export const logActivity = (actionType, details, actorName = "System") => {
 
     const formattedTimestamp = `${day}/${month}/${year}, ${time}`;
 
-
     const newLog = {
-        id: Date.now(),
         timestamp: formattedTimestamp,
         actor: actorName,
         action: actionType,
         details: details
     };
 
-    const existingLogs = JSON.parse(localStorage.getItem("admin_activity_logs")) || [];
-    const updatedLogs = [newLog, ...existingLogs];
-    localStorage.setItem("admin_activity_logs", JSON.stringify(updatedLogs));
+    try {
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newLog),
+        });
 
-    window.dispatchEvent(new Event("activityLogsUpdated"));
+        if (!response.ok) {
+            throw new Error("Failed to save activity log to cloud");
+        }
+
+        // Notify open tabs/components to refresh logs
+        window.dispatchEvent(new Event("activityLogsUpdated"));
+    } catch (error) {
+        console.error("Error logging activity:", error);
+    }
 };

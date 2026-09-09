@@ -88,25 +88,30 @@ export default function UserDashboard() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#F9B2BC] px-4 py-8 relative overflow-hidden text-[#4a242c]">
-     
-      <div className="absolute -top-32 -left-32 w-96 h-96 bg-white/30 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#F67C8E]/20 rounded-full blur-3xl pointer-events-none"></div>
+    <div 
+      className="min-h-screen w-full bg-[#240b3b] px-4 py-8 relative overflow-hidden text-white font-sans"
+      style={{ backgroundImage: "radial-gradient(circle at 20% 30%, rgba(105, 30, 150, 0.45) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(190, 40, 110, 0.35) 0%, transparent 50%), #240b3b" }}
+    >
+      
+      {/* Background Lighting Effects */}
+      <div className="absolute -top-32 -left-32 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-pink-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
       <div
         className={`transition-all duration-300 ${
           showConfirm ? "filter blur-sm pointer-events-none select-none" : ""
         }`}
       >
-       
-        <div className="w-[92%] max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center bg-[#FCD3DC] backdrop-blur-md p-6 rounded-3xl shadow-xl mb-6 border border-white/60 z-10 relative">
+        
+        {/* Top Header Card */}
+        <div className="w-[92%] max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center bg-[#2e1048]/95 backdrop-blur-md p-6 rounded-3xl shadow-2xl mb-6 border border-purple-500/30 z-10 relative">
           <div className="mb-4 md:mb-0">
-            <h1 className="text-2xl font-extrabold text-[#4a242c]">
+            <h1 className="text-2xl font-extrabold text-white tracking-wide">
               User Dashboard
             </h1>
-            <p className="text-sm text-[#68333e] font-medium">
+            <p className="text-sm text-purple-200/70 font-medium mt-1">
               Welcome: {" "}
-              <span className="font-semibold text-xl text-[#4a242c]">
+              <span className="font-semibold text-lg text-orange-400">
                 {currentUser?.username}
               </span>
             </p>
@@ -114,31 +119,31 @@ export default function UserDashboard() {
           <div className="space-x-3">
             <button
               onClick={() => navigate("/create-form")}
-              className="px-4 py-2.5 bg-[#F45B73] hover:bg-[#E04860] text-white rounded-xl font-bold text-sm transition duration-200 shadow-md"
+              className="px-5 py-2.5 bg-linear-to-r from-orange-500 to-pink-600 hover:opacity-95 text-white rounded-xl font-bold text-sm transition duration-200 shadow-lg tracking-wider"
             >
               Create New Form
             </button>
             <button
               onClick={handleLogout}
-              className="px-4 py-2.5 bg-red-500/15 text-red-700 border border-red-400/40 rounded-xl font-bold text-sm hover:bg-red-500/25 transition duration-200"
+              className="px-5 py-2.5 bg-red-500/15 text-red-400 border border-red-500/30 rounded-xl font-bold text-sm hover:bg-red-500/25 transition duration-200"
             >
               Logout
             </button>
           </div>
         </div>
 
-        
-        <div className="w-[92%] max-w-7xl mx-auto bg-[#FCD3DC] backdrop-blur-md p-6 rounded-3xl shadow-xl border border-white/60 z-10 relative">
-          <h2 className="text-lg font-bold text-[#4a242c] mb-4">
+        {/* Submissions Table Section */}
+        <div className="w-[92%] max-w-7xl mx-auto bg-[#2e1048]/95 backdrop-blur-md p-6 rounded-3xl shadow-2xl border border-purple-500/30 z-10 relative">
+          <h2 className="text-lg font-bold text-white mb-4 tracking-wide">
             My Submissions
           </h2>
 
           {error && (
-            <p className="text-red-600 text-sm mb-4 font-medium">{error}</p>
+            <p className="text-red-400 text-sm mb-4 font-medium">{error}</p>
           )}
 
           {submissions.length === 0 ? (
-            <p className="text-[#68333e] text-sm font-medium">
+            <p className="text-purple-200/70 text-sm font-medium py-4">
               You haven't added any submissions yet. Click "Create New Form" to
               get started.
             </p>
@@ -146,59 +151,51 @@ export default function UserDashboard() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-white/60 text-xs font-bold text-[#5c2d36] uppercase">
-                    <th className="pb-3 px-2">Name</th>
-                    <th className="pb-3 px-2">Email</th>
-                    <th className="pb-3 px-2">Phone</th>
-                    <th className="pb-3 px-2">Gender</th>
-                    <th className="pb-3 px-2">Date</th>
-                    <th className="pb-3 px-2 text-right pr-20">Actions</th>
+                  <tr className="border-b border-purple-500/30 text-xs font-bold text-purple-300 uppercase tracking-wider">
+                    <th className="pb-3 px-3">Name</th>
+                    <th className="pb-3 px-3">Email</th>
+                    <th className="pb-3 px-3">Phone</th>
+                    <th className="pb-3 px-3">Gender</th>
+                    <th className="pb-3 px-3">Date</th>
+                    <th className="pb-3 px-3 text-right pr-6">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/40 text-sm text-[#4a242c]">
+                <tbody className="divide-y divide-purple-500/20 text-sm text-purple-100">
                   {submissions.map((sub) => (
-                    <tr key={sub.id} className="hover:bg-white/30 transition">
-                      <td className="py-3 px-2">
-                        <div className="font-bold text-[#4a242c]">
-                          {sub.fullName}
-                        </div>
+                    <tr key={sub.id} className="hover:bg-purple-900/30 transition">
+                      <td className="py-3 px-3 font-bold text-white">
+                        {sub.fullName}
                       </td>
-                      <td>
-                        <div className="text-xs text-[#68333e] font-medium">
-                          {sub.email}
-                        </div>
+                      <td className="py-3 px-3 text-xs text-purple-200/80 font-medium">
+                        {sub.email}
                       </td>
-                      <td className="py-3 px-2">
-                        <div className="text-xs font-medium text-[#68333e]">
-                          {sub.phone || "N/A"}
-                        </div>
+                      <td className="py-3 px-3 text-xs font-medium text-purple-200/80">
+                        {sub.phone || "N/A"}
                       </td>
-                      <td className="py-3 px-2">
-                        <div className="font-medium text-[#4a242c]">
-                          {sub.gender || "N/A"}
-                        </div>
+                      <td className="py-3 px-3 font-medium text-purple-200">
+                        {sub.gender || "N/A"}
                       </td>
-                      <td className="py-3 px-2 text-xs text-[#68333e] font-medium">
+                      <td className="py-3 px-3 text-xs text-purple-200/80 font-medium">
                         {sub.dateOfSubmission
                           ? sub.dateOfSubmission.split("-").reverse().join("/")
                           : "N/A"}
                       </td>
-                      <td className="py-3 px-2 text-right space-x-2 whitespace-nowrap">
+                      <td className="py-3 px-3 text-right space-x-2 whitespace-nowrap">
                         <button
                           onClick={() => handleViewClick(sub)}
-                          className="px-3 py-1 bg-sky-500/20 text-sky-900 border border-sky-400/40 rounded-xl text-xs font-bold hover:bg-sky-500/35 transition"
+                          className="px-3 py-1.5 bg-sky-500/20 text-sky-300 border border-sky-500/40 rounded-xl text-xs font-bold hover:bg-sky-500/30 transition"
                         >
                           View
                         </button>
                         <button
                           onClick={() => navigate(`/edit-form/${sub.id}`)}
-                          className="px-3 py-1 bg-white/50 text-[#4a242c] border border-white/80 rounded-xl text-xs font-bold hover:bg-white/80 transition"
+                          className="px-3 py-1.5 bg-purple-500/20 text-purple-200 border border-purple-500/40 rounded-xl text-xs font-bold hover:bg-purple-500/35 transition"
                         >
                           Edit
                         </button>
                         <button
                           onClick={() => handleDeleteClick(sub.id)}
-                          className="px-3 py-1 bg-red-500/15 text-red-700 border border-red-400/40 rounded-xl text-xs font-bold hover:bg-red-500/25 transition"
+                          className="px-3 py-1.5 bg-red-500/20 text-red-300 border border-red-500/40 rounded-xl text-xs font-bold hover:bg-red-500/30 transition"
                         >
                           Delete
                         </button>
@@ -212,27 +209,27 @@ export default function UserDashboard() {
         </div>
       </div>
 
-   
+      {/* Confirmation Modal */}
       {showConfirm && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50 px-4">
-          <div className="bg-[#FCD3DC] backdrop-blur-md p-6 rounded-3xl shadow-2xl max-w-sm w-full border border-white/80 text-center">
-            <h3 className="text-lg font-extrabold text-[#4a242c] mb-2">
+        <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50 px-4">
+          <div className="bg-[#2e1048] backdrop-blur-md p-6 rounded-3xl shadow-2xl max-w-sm w-full border border-purple-500/40 text-center">
+            <h3 className="text-lg font-extrabold text-white mb-2 tracking-wide">
               Are you sure?
             </h3>
-            <p className="text-xs text-[#68333e] mb-6 font-medium">
+            <p className="text-xs text-purple-200/80 mb-6 font-medium">
               Do you really want to delete this submission? This action cannot
               be undone.
             </p>
             <div className="flex justify-center space-x-3">
               <button
                 onClick={() => setShowConfirm(false)}
-                className="px-4 py-2 bg-white/60 hover:bg-white text-[#4a242c] border border-[#E899A4]/50 rounded-xl text-xs font-bold transition"
+                className="px-4 py-2 bg-purple-900/50 hover:bg-purple-900 text-purple-200 border border-purple-500/40 rounded-xl text-xs font-bold transition"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmDelete}
-                className="px-4 py-2 bg-[#F45B73] hover:bg-[#E04860] text-white rounded-xl text-xs font-bold transition shadow-md"
+                className="px-4 py-2 bg-gradient-to-r from-orange-500 to-pink-600 hover:opacity-95 text-white rounded-xl text-xs font-bold transition shadow-lg tracking-wider"
               >
                 Yes, Delete
               </button>

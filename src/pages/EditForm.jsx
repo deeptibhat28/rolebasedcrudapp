@@ -12,7 +12,7 @@ export default function EditForm() {
       localStorage.getItem("user") || localStorage.getItem("currentUser"),
     ) || {};
 
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -48,6 +48,15 @@ export default function EditForm() {
           parsedSkills = currentSub.skills.split(",").map((s) => s.trim());
         }
 
+        const predefinedEdu = [
+          "HSC",
+          "SSC",
+          "Bachelor's Degree",
+          "Master's Degree",
+          "PhD",
+        ];
+        const isPredefined = predefinedEdu.includes(currentSub.education);
+
         setFormData({
           fullName: currentSub.fullName || "",
           email: currentSub.email || "",
@@ -55,8 +64,12 @@ export default function EditForm() {
           department: currentSub.department || "",
           designation: currentSub.designation || "",
           gender: currentSub.gender || "",
-          education: currentSub.education || "",
-          customEducation: currentSub.customEducation || "",
+          education: isPredefined
+            ? currentSub.education
+            : currentSub.education
+              ? "Other"
+              : "",
+          customEducation: isPredefined ? "" : currentSub.education || "",
           skills: parsedSkills,
           address: currentSub.address || "",
           description: currentSub.description || "",
@@ -75,7 +88,7 @@ export default function EditForm() {
 
     if (name === "fullName" || name === "department") {
       if (value !== "" && !/^[A-Za-z\s]*$/.test(value)) {
-        return; 
+        return;
       }
     }
 
@@ -99,27 +112,53 @@ export default function EditForm() {
     }
 
     const emailValue = formData.email.trim();
-    
+
     if (emailValue.includes(" ")) {
       toast.warn("Email address cannot contain spaces.");
       return;
     }
 
-    const strictEmailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.(com|in|org|net|edu|gov|co|io)$/i;
+    const strictEmailRegex =
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.(com|in|org|net|edu|gov|co|io)$/i;
 
     if (!strictEmailRegex.test(emailValue)) {
-      toast.warn("Please enter a valid email address(e.g., example123@gmail.com).");
+      toast.warn(
+        "Please enter a valid email address(e.g., example123@gmail.com).",
+      );
       return;
     }
 
-    if (formData.phone) {
-      const phoneRegex = /^\d{10}$/;
-      if (!phoneRegex.test(formData.phone)) {
-        toast.warn(
-          "Please enter a valid phone number (must be exactly 10 digits)",
-        );
-        return;
-      }
+    const phoneValue = formData.phone.trim();
+
+    if (/[a-zA-Z]/.test(phoneValue)) {
+      toast.warn("Phone number cannot contain alphabetic characters.");
+      return;
+    }
+
+    if (/[()\[\]{}]/.test(phoneValue)) {
+      toast.warn("Brackets are not allowed in the phone number.");
+      return;
+    }
+
+    const rawDigits = phoneValue.replace(/[^0-9]/g, "");
+
+    if (/^(\d)\1+$/.test(rawDigits)) {
+      toast.warn("Please enter a valid phone number, not repeated digits.");
+      return;
+    }
+
+    if (rawDigits.length < 10 || rawDigits.length > 15) {
+      toast.warn("Please enter a valid phone number.");
+      return;
+    }
+
+    const strictCountryCodeFormatRegex = /^\+?[1-9]\d{0,2}[-\s]?\d{7,12}$/;
+
+    if (!strictCountryCodeFormatRegex.test(phoneValue)) {
+      toast.warn(
+        "Hyphens or spaces are only allowed immediately after the country code.",
+      );
+      return;
     }
 
     const alphaRegex = /^[A-Za-z\s]+$/;
@@ -128,14 +167,16 @@ export default function EditForm() {
       return;
     }
 
-    setLoading(true); 
+    setLoading(true);
 
     try {
       const finalEducation =
-        formData.education === "Other" ? formData.customEducation : formData.education;
+        formData.education === "Other"
+          ? formData.customEducation
+          : formData.education;
 
-      const formattedSkills = Array.isArray(formData.skills) 
-        ? formData.skills.join(", ") 
+      const formattedSkills = Array.isArray(formData.skills)
+        ? formData.skills.join(", ")
         : formData.skills;
 
       const updatedRecord = {
@@ -145,13 +186,13 @@ export default function EditForm() {
         userId: currentUser.id,
         username: currentUser.username,
       };
-      
+
       await updateSubmission(id, updatedRecord);
 
       logActivity(
         "FORM_UPDATE",
         `Updated submission record for: ${formData.fullName || "User Record"}`,
-        currentUser?.username || "User"
+        currentUser?.username || "User",
       );
 
       toast.success("Record updated successfully");
@@ -159,14 +200,20 @@ export default function EditForm() {
     } catch (err) {
       toast.error("Failed to update submission. Please try again.");
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
- return (
-    <div className="min-h-screen w-full bg-[#F9B2BC] px-4 py-8 relative overflow-hidden flex items-center justify-center text-[#4a242c]">
-      <div className="absolute -top-32 -left-32 w-96 h-96 bg-white/30 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#F67C8E]/20 rounded-full blur-3xl pointer-events-none"></div>
+  return (
+    <div
+      className="min-h-screen w-full bg-[#240b3b] px-6 py-8 relative overflow-hidden text-white font-sans"
+      style={{
+        backgroundImage:
+          "radial-gradient(circle at 20% 30%, rgba(105, 30, 150, 0.45) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(190, 40, 110, 0.35) 0%, transparent 50%), #240b3b",
+      }}
+    >
+      <div className="absolute -top-32 -left-32 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-pink-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
       <style>{`
         input:-webkit-autofill,
@@ -175,34 +222,40 @@ export default function EditForm() {
         input:-webkit-autofill:active,
         textarea:-webkit-autofill,
         select:-webkit-autofill {
-          -webkit-box-shadow: 0 0 0 1000px #FCD3DC inset !important;
-          -webkit-text-fill-color: #4a242c !important;
+          -webkit-box-shadow: 0 0 0 1000px #1b082d inset !important;
+          -webkit-text-fill-color: white !important;
           transition: background-color 5000s ease-in-out 0s !important;
         }
       `}</style>
 
-      <div className="bg-[#FCD3DC] backdrop-blur-md p-8 rounded-3xl shadow-2xl border border-white/60 max-w-lg w-full relative z-15 my-8">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-xl font-extrabold text-[#4a242c]">
-              Edit Submission Form
-            </h1>
-            <p className="text-xs text-[#68333e]/80">
-              Update user record details
-            </p>
-          </div>
+      {/* Full-Width Header Panel */}
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center bg-[#2e1048]/95 backdrop-blur-md p-6 rounded-3xl shadow-2xl mb-6 border border-purple-500/30 relative z-10">
+        <div className="mb-4 md:mb-0">
+          <h1 className="text-2xl font-extrabold text-white tracking-wide">
+            Edit Submission Form
+          </h1>
+          <p className="text-sm text-purple-300/80 mt-0.5">
+            Update user record details
+          </p>
+        </div>
+        <div>
           <button
             onClick={() => navigate("/user-dashboard")}
-            className="text-xs font-bold text-[#68333e] hover:text-[#4a242c] transition"
+            className="px-4 py-2.5 bg-[#1b082d]/70 text-purple-200 border border-purple-500/40 rounded-xl font-bold text-sm hover:bg-[#1b082d] transition duration-200 shadow-md"
           >
-            Back to Dashboard
+            ← Back to Dashboard
           </button>
         </div>
+      </div>
 
-        <form onSubmit={handleSubmit} noValidate className="space-y-4">
-          <div>
-            <label className="block text-xs font-bold text-[#5c2d36] uppercase tracking-wider mb-1">
-              Full Name <span className="text-red-600">*</span>
+      {/* Full-Width Content Container */}
+      <div className="max-w-7xl mx-auto bg-[#2e1048]/95 backdrop-blur-md p-8 rounded-3xl shadow-2xl border border-purple-500/30 relative z-10">
+        <form onSubmit={handleSubmit} noValidate className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+          
+          {/* Full Name */}
+          <div className="md:col-span-2 bg-[#1b082d]/70 p-4 rounded-2xl border border-purple-500/40 shadow-inner">
+            <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-1">
+              Full Name <span className="text-red-400">*</span>
             </label>
             <input
               type="text"
@@ -212,81 +265,84 @@ export default function EditForm() {
               required
               autoComplete="new-password"
               placeholder="Only alphabets and spaces"
-              className="w-full px-3 py-2 bg-[#FCD3DC] border border-[#D58C99] rounded-xl text-sm text-[#4a242c] placeholder-[#8C4A56] focus:outline-none focus:ring-2 focus:ring-[#F45B73]"
+              className="w-full px-4 py-3 bg-[#240b3b] border border-purple-500/40 rounded-xl text-sm text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-[#5c2d36] uppercase tracking-wider mb-1">
-                Email Address <span className="text-red-600">*</span>
-              </label>
-              <input
-                type="text"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                autoComplete="new-password"
-                placeholder="example@gmail.com"
-                className="w-full px-3 py-2 bg-[#FCD3DC] border border-[#D58C99] rounded-xl text-sm text-[#4a242c] placeholder-[#8C4A56] focus:outline-none focus:ring-2 focus:ring-[#F45B73]"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-[#5c2d36] uppercase tracking-wider mb-1">
-                Phone Number <span className="text-red-600">*</span>
-              </label>
-              <input
-                type="text"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                required
-                autoComplete="off"
-                placeholder="10 digit phone number"
-                className="w-full px-3 py-2 bg-[#FCD3DC] border border-[#D58C99] rounded-xl text-sm text-[#4a242c] placeholder-[#8C4A56] focus:outline-none focus:ring-2 focus:ring-[#F45B73]"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-[#5c2d36] uppercase tracking-wider mb-1">
-                Department <span className="text-red-600">*</span>
-              </label>
-              <input
-                type="text"
-                name="department"
-                value={formData.department}
-                onChange={handleChange}
-                required
-                autoComplete="off"
-                placeholder="Only letters and spaces"
-                className="w-full px-3 py-2 bg-[#FCD3DC] border border-[#D58C99] rounded-xl text-sm text-[#4a242c] placeholder-[#8C4A56] focus:outline-none focus:ring-2 focus:ring-[#F45B73]"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-[#5c2d36] uppercase tracking-wider mb-1">
-                Designation <span className="text-red-600">*</span>
-              </label>
-              <input
-                type="text"
-                name="designation"
-                value={formData.designation}
-                onChange={handleChange}
-                required
-                autoComplete="off"
-                placeholder="Only letters and spaces"
-                className="w-full px-3 py-2 bg-[#FCD3DC] border border-[#D58C99] rounded-xl text-sm text-[#4a242c] placeholder-[#8C4A56] focus:outline-none focus:ring-2 focus:ring-[#F45B73]"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-[#5c2d36] uppercase tracking-wider mb-2">
-              Gender <span className="text-red-600">*</span>
+          {/* Email Address */}
+          <div className="bg-[#1b082d]/70 p-4 rounded-2xl border border-purple-500/40 shadow-inner">
+            <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-1">
+              Email Address <span className="text-red-400">*</span>
             </label>
-            <div className="flex items-center space-x-6 text-[#4a242c] text-sm pt-1">
+            <input
+              type="text"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              autoComplete="new-password"
+              placeholder="example@gmail.com"
+              className="w-full px-4 py-3 bg-[#240b3b] border border-purple-500/40 rounded-xl text-sm text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner"
+            />
+          </div>
+
+          {/* Phone Number */}
+          <div className="bg-[#1b082d]/70 p-4 rounded-2xl border border-purple-500/40 shadow-inner">
+            <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-1">
+              Phone Number <span className="text-red-400">*</span>
+            </label>
+            <input
+              type="text"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              required
+              autoComplete="off"
+              placeholder="10 digit phone number"
+              className="w-full px-4 py-3 bg-[#240b3b] border border-purple-500/40 rounded-xl text-sm text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner"
+            />
+          </div>
+
+          {/* Department */}
+          <div className="bg-[#1b082d]/70 p-4 rounded-2xl border border-purple-500/40 shadow-inner">
+            <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-1">
+              Department <span className="text-red-400">*</span>
+            </label>
+            <input
+              type="text"
+              name="department"
+              value={formData.department}
+              onChange={handleChange}
+              required
+              autoComplete="off"
+              placeholder="Only letters and spaces"
+              className="w-full px-4 py-3 bg-[#240b3b] border border-purple-500/40 rounded-xl text-sm text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner"
+            />
+          </div>
+
+          {/* Designation */}
+          <div className="bg-[#1b082d]/70 p-4 rounded-2xl border border-purple-500/40 shadow-inner">
+            <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-1">
+              Designation <span className="text-red-400">*</span>
+            </label>
+            <input
+              type="text"
+              name="designation"
+              value={formData.designation}
+              onChange={handleChange}
+              required
+              autoComplete="off"
+              placeholder="Only letters and spaces"
+              className="w-full px-4 py-3 bg-[#240b3b] border border-purple-500/40 rounded-xl text-sm text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner"
+            />
+          </div>
+
+          {/* Gender */}
+          <div className="bg-[#1b082d]/70 p-4 rounded-2xl border border-purple-500/40 shadow-inner">
+            <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-2">
+              Gender <span className="text-red-400">*</span>
+            </label>
+            <div className="flex items-center space-x-6 text-purple-100 text-sm pt-2">
               {["Male", "Female", "Other"].map((option) => (
                 <label
                   key={option}
@@ -299,7 +355,7 @@ export default function EditForm() {
                     checked={formData.gender === option}
                     onChange={handleChange}
                     required
-                    className="text-[#F45B73] focus:ring-[#F45B73] bg-[#FCD3DC] border-[#D58C99]"
+                    className="text-orange-500 focus:ring-orange-500 bg-[#240b3b] border-purple-500/40"
                   />
                   <span>{option}</span>
                 </label>
@@ -307,9 +363,10 @@ export default function EditForm() {
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-[#5c2d36] uppercase tracking-wider mb-1">
-              Highest Education <span className="text-red-600">*</span>
+          {/* Highest Education */}
+          <div className="bg-[#1b082d]/70 p-4 rounded-2xl border border-purple-500/40 shadow-inner">
+            <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-1">
+              Highest Education <span className="text-red-400">*</span>
             </label>
             <select
               name="education"
@@ -321,9 +378,11 @@ export default function EditForm() {
                 }
               }}
               required
-              className="w-full px-3 py-2 bg-[#FCD3DC] border border-[#D58C99] rounded-xl text-sm text-[#4a242c] focus:outline-none focus:ring-2 focus:ring-[#F45B73]"
+              className="w-full px-4 py-3 bg-[#240b3b] border border-purple-500/40 rounded-xl text-sm text-white focus:outline-none focus:border-orange-500 transition shadow-inner [&>option]:bg-[#240b3b] [&>option]:text-white"
             >
-              <option value="" disabled>Select Education</option>
+              <option value="" disabled>
+                Select Education
+              </option>
               <option value="HSC">HSC</option>
               <option value="SSC">SSC</option>
               <option value="Bachelor's Degree">Bachelor's Degree</option>
@@ -333,10 +392,11 @@ export default function EditForm() {
             </select>
           </div>
 
+          {/* Custom Education (if Other) */}
           {formData.education === "Other" && (
-            <div>
-              <label className="block text-xs font-bold text-[#5c2d36] uppercase tracking-wider mb-1">
-                Custom Education <span className="text-red-600">*</span>
+            <div className="md:col-span-2 bg-[#1b082d]/70 p-4 rounded-2xl border border-purple-500/40 shadow-inner">
+              <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-1">
+                Custom Education <span className="text-red-400">*</span>
               </label>
               <input
                 type="text"
@@ -346,16 +406,17 @@ export default function EditForm() {
                 placeholder="Please specify education"
                 required
                 autoComplete="off"
-                className="w-full px-3 py-2 bg-[#FCD3DC] border border-[#D58C99] rounded-xl text-sm text-[#4a242c] placeholder-[#8C4A56] focus:outline-none focus:ring-2 focus:ring-[#F45B73]"
+                className="w-full px-4 py-3 bg-[#240b3b] border border-purple-500/40 rounded-xl text-sm text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner"
               />
             </div>
           )}
 
-          <div>
-            <label className="block text-xs font-bold text-[#5c2d36] uppercase tracking-wider mb-2">
+          {/* Skills */}
+          <div className="md:col-span-2 bg-[#1b082d]/70 p-4 rounded-2xl border border-purple-500/40 shadow-inner">
+            <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-2">
               Skills
             </label>
-            <div className="grid grid-cols-2 gap-2 bg-[#F6B8C2]/40 border border-[#D58C99] p-3 rounded-xl">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {[
                 "React.js",
                 "Node.js",
@@ -375,7 +436,7 @@ export default function EditForm() {
                 return (
                   <label
                     key={skill}
-                    className="flex items-center space-x-2 text-sm text-[#4a242c] cursor-pointer select-none"
+                    className="flex items-center space-x-2 text-sm text-purple-100 cursor-pointer select-none bg-[#240b3b]/60 p-3 rounded-xl border border-purple-500/30 hover:border-purple-500/60 transition"
                   >
                     <input
                       type="checkbox"
@@ -387,7 +448,7 @@ export default function EditForm() {
                           updatedSkills.push(skill);
                         } else {
                           updatedSkills = updatedSkills.filter(
-                            (s) => s !== skill
+                            (s) => s !== skill,
                           );
                         }
                         setFormData((prev) => ({
@@ -395,7 +456,7 @@ export default function EditForm() {
                           skills: updatedSkills,
                         }));
                       }}
-                      className="rounded bg-[#FCD3DC] border-[#D58C99] text-[#F45B73] focus:ring-[#F45B73] w-4 h-4"
+                      className="rounded bg-[#240b3b] border-purple-500/40 text-orange-500 focus:ring-orange-500 w-4 h-4"
                     />
                     <span>{skill}</span>
                   </label>
@@ -404,9 +465,10 @@ export default function EditForm() {
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-[#5c2d36] uppercase tracking-wider mb-1">
-              Address <span className="text-red-600">*</span>
+          {/* Address */}
+          <div className="md:col-span-2 bg-[#1b082d]/70 p-4 rounded-2xl border border-purple-500/40 shadow-inner">
+            <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-1">
+              Address <span className="text-red-400">*</span>
             </label>
             <textarea
               name="address"
@@ -416,12 +478,13 @@ export default function EditForm() {
               required
               autoComplete="off"
               placeholder="Enter address..."
-              className="w-full px-3 py-2 bg-[#FCD3DC] border border-[#D58C99] rounded-xl text-sm text-[#4a242c] placeholder-[#8C4A56] focus:outline-none focus:ring-2 focus:ring-[#F45B73]"
+              className="w-full px-4 py-3 bg-[#240b3b] border border-purple-500/40 rounded-xl text-sm text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner resize-none"
             />
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-[#5c2d36] uppercase tracking-wider mb-1">
+          {/* Description */}
+          <div className="md:col-span-2 bg-[#1b082d]/70 p-4 rounded-2xl border border-purple-500/40 shadow-inner">
+            <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-1">
               Description
             </label>
             <textarea
@@ -431,58 +494,63 @@ export default function EditForm() {
               rows="2"
               autoComplete="off"
               placeholder="Enter description..."
-              className="w-full px-3 py-2 bg-[#FCD3DC] border border-[#D58C99] rounded-xl text-sm text-[#4a242c] placeholder-[#8C4A56] focus:outline-none focus:ring-2 focus:ring-[#F45B73]"
+              className="w-full px-4 py-3 bg-[#240b3b] border border-purple-500/40 rounded-xl text-sm text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner resize-none"
             />
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-[#5c2d36] uppercase tracking-wider mb-1">
-              Date of Submission <span className="text-red-600">*</span>
+          {/* Date of Submission */}
+          <div className="md:col-span-2 bg-[#1b082d]/70 p-4 rounded-2xl border border-purple-500/40 shadow-inner">
+            <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-1">
+              Date of Submission <span className="text-red-400">*</span>
             </label>
             <input
               type="date"
               name="dateOfSubmission"
               value={formData.dateOfSubmission}
               readOnly
-              className="w-full px-3 py-2 bg-[#F6B8C2]/50 border border-[#D58C99] rounded-xl text-sm text-[#68333e] cursor-not-allowed focus:outline-none"
+              className="w-full px-4 py-3 bg-[#240b3b]/60 border border-purple-500/30 rounded-xl text-sm text-purple-300/60 cursor-not-allowed focus:outline-none shadow-inner"
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full py-3 bg-[#F45B73] hover:bg-[#E04860] text-white rounded-2xl font-bold text-sm transition shadow-md mt-2 flex items-center justify-center space-x-2 ${
-              loading ? "opacity-75 cursor-not-allowed" : ""
-            }`}
-          >
-            {loading ? (
-              <>
-                <svg
-                  className="animate-spin h-5 w-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                <span>Updating...</span>
-              </>
-            ) : (
-              <span>Update Record</span>
-            )}
-          </button>
+          {/* Update Button */}
+          <div className="md:col-span-2 pt-2">
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full py-3.5 bg-linear-to-r from-orange-500 to-pink-600 hover:opacity-95 text-white font-bold rounded-xl transition duration-150 shadow-lg text-sm tracking-widest uppercase flex items-center justify-center space-x-2 ${
+                loading ? "opacity-75 cursor-not-allowed" : ""
+              }`}
+            >
+              {loading ? (
+                <>
+                  <svg
+                    className="animate-spin h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  <span>Updating...</span>
+                </>
+              ) : (
+                <span>Update Record</span>
+              )}
+            </button>
+          </div>
+
         </form>
       </div>
     </div>
