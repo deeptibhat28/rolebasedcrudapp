@@ -28,7 +28,7 @@ export default function AdminDashboard() {
   const fetchAllSubmissions = async () => {
     try {
       const data = await getSubmissions();
-      setSubmissions(data);
+      setSubmissions(data.reverse()); // <-- Added .reverse() here to show newest first
     } catch (err) {
       toast.error("Failed to fetch all submissions.");
     }
@@ -167,6 +167,7 @@ export default function AdminDashboard() {
             Total Records: {filteredSubmissions.length}{" "}
             {searchTerm && `(filtered from ${submissions.length})`}
           </span>
+
         </div>
 
         {submissions.length === 0 ? (
