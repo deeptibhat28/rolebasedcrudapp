@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { getSubmissions, updateSubmission } from "../services/api";
 import { toast } from "react-toastify";
 import { logActivity } from "../utils/logger";
+import { isValidPhoneNumber } from "libphonenumber-js";
 
 export default function EditForm() {
   const navigate = useNavigate();
@@ -20,12 +21,12 @@ export default function EditForm() {
     countryCode: "+91",
     customCountryCode: "",
     phone: "",
-    department: "",
-    designation: "",
     gender: "",
     education: "",
     customEducation: "",
     skills: [],
+    department: "",
+    designation: "",
     address: "",
     description: "",
     dateOfSubmission: "",
@@ -59,38 +60,40 @@ export default function EditForm() {
         ];
         const isPredefined = predefinedEdu.includes(currentSub.education);
 
-        let extractedCountryCode = "+91";
-        let extractedCustomCode = "";
-        let extractedPhone = currentSub.phone || "";
+        // Smart phone splitting logic from saved format (e.g. "+44 789456121")
+        let rawCountryCode = "+91";
+        let rawCustomCountryCode = "";
+        let rawPhone = currentSub.phone || "";
 
-        if (extractedPhone.includes(" ")) {
-          const parts = extractedPhone.split(" ");
-          const possibleCode = parts[0];
-          const standardCodes = ["+91", "+1", "+44", "+61", "+81"];
-          if (standardCodes.includes(possibleCode)) {
-            extractedCountryCode = possibleCode;
-            extractedPhone = parts.slice(1).join("");
-          } else if (possibleCode.startsWith("+")) {
-            extractedCountryCode = "Other";
-            extractedCustomCode = possibleCode;
-            extractedPhone = parts.slice(1).join("");
+        if (currentSub.phone) {
+          const parts = currentSub.phone.trim().split(" ");
+          if (parts.length > 1 && parts[0].startsWith("+")) {
+            const potentialCode = parts[0];
+            const supportedStandardCodes = ["+91", "+1", "+44", "+61", "+81"];
+            if (supportedStandardCodes.includes(potentialCode)) {
+              rawCountryCode = potentialCode;
+            } else {
+              rawCountryCode = "Other";
+              rawCustomCountryCode = potentialCode;
+            }
+            rawPhone = parts.slice(1).join("");
           }
         }
 
         setFormData({
           fullName: currentSub.fullName || "",
           email: currentSub.email || "",
-          countryCode: extractedCountryCode,
-          customCountryCode: extractedCustomCode,
-          phone: extractedPhone.replace(/\D/g, "").slice(0, 10),
+          countryCode: rawCountryCode,
+          customCountryCode: rawCustomCountryCode,
+          phone: rawPhone.replace(/\D/g, ""),
           department: currentSub.department || "",
           designation: currentSub.designation || "",
           gender: currentSub.gender || "",
           education: isPredefined
             ? currentSub.education
             : currentSub.education
-              ? "Other"
-              : "",
+            ? "Other"
+            : "",
           customEducation: isPredefined ? "" : currentSub.education || "",
           skills: parsedSkills,
           address: currentSub.address || "",
@@ -114,8 +117,9 @@ export default function EditForm() {
       }
     }
 
+    // Allow digits only for the phone field
     if (name === "phone") {
-      const numericValue = value.replace(/\D/g, "").slice(0, 10);
+      const numericValue = value.replace(/\D/g, "");
       setFormData({ ...formData, phone: numericValue });
       return;
     }
@@ -151,18 +155,8 @@ export default function EditForm() {
 
     if (!strictEmailRegex.test(emailValue)) {
       toast.warn(
-        "Please enter a valid email address (e.g., example123@gmail.com).",
+        "Please enter a valid email address (e.g., example@gmail.com).",
       );
-      return;
-    }
-
-    if (formData.phone.length !== 10) {
-      toast.warn("Phone number must be strictly 10 digits.");
-      return;
-    }
-
-    if (/^(\d)\1+$/.test(formData.phone)) {
-      toast.warn("Please enter a valid phone number, not repeated digits.");
       return;
     }
 
@@ -173,6 +167,30 @@ export default function EditForm() {
 
     if (formData.countryCode === "Other" && !activeCountryCode) {
       toast.warn("Please specify your custom country code.");
+      return;
+    }
+
+    // Format country code to make sure it includes '+'
+    const formattedCountryCode = activeCountryCode.startsWith("+")
+      ? activeCountryCode
+      : `+${activeCountryCode}`;
+
+    // 1. Strictly enforce 10 digits ONLY for Indian numbers (+91)
+    if (formattedCountryCode === "+91" && formData.phone.length !== 10) {
+      toast.warn("Phone number must be of 10 digits.");
+      return;
+    }
+
+    const fullPhoneNumber = `${formattedCountryCode}${formData.phone}`;
+
+    // 2. Global regional validation using libphonenumber-js for all countries
+    if (!isValidPhoneNumber(fullPhoneNumber)) {
+      toast.warn("Please enter a valid phone number for the selected region.");
+      return;
+    }
+
+    if (/^(\d)\1+$/.test(formData.phone)) {
+      toast.warn("Please enter a valid phone number, not repeated digits.");
       return;
     }
 
@@ -194,11 +212,12 @@ export default function EditForm() {
         ? formData.skills.join(", ")
         : formData.skills;
 
-      const fullPhoneNumber = `${activeCountryCode} ${formData.phone}`;
+      // Store complete formatted phone number
+      const displayPhoneNumber = `${formattedCountryCode} ${formData.phone}`;
 
       const updatedRecord = {
         ...formData,
-        phone: fullPhoneNumber,
+        phone: displayPhoneNumber,
         education: finalEducation,
         skills: formattedSkills,
         userId: currentUser.id,
@@ -346,8 +365,7 @@ export default function EditForm() {
                 onChange={handleChange}
                 required
                 autoComplete="new-password"
-                maxLength={10}
-                placeholder="10-digit number"
+                placeholder="Phone number"
                 className={`${formData.countryCode === "Other" ? "sm:col-span-1" : "sm:col-span-2"} w-full px-4 py-3 bg-[#240b3b] border border-purple-500/40 rounded-xl text-sm text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner`}
               />
             </div>

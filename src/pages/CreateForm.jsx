@@ -1,11 +1,13 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { createSubmission } from "../services/api";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { getSubmissions, updateSubmission } from "../services/api";
 import { toast } from "react-toastify";
 import { logActivity } from "../utils/logger";
+import { isValidPhoneNumber } from "libphonenumber-js";
 
-export default function CreateForm() {
+export default function EditForm() {
   const navigate = useNavigate();
+  const { id } = useParams();
   const currentUser =
     JSON.parse(
       localStorage.getItem("user") || localStorage.getItem("currentUser"),
@@ -27,8 +29,84 @@ export default function CreateForm() {
     designation: "",
     address: "",
     description: "",
-    dateOfSubmission: new Date().toISOString().split("T")[0],
+    dateOfSubmission: "",
   });
+
+  useEffect(() => {
+    fetchSubmissionData();
+  }, [id]);
+
+  const fetchSubmissionData = async () => {
+    try {
+      const data = await getSubmissions();
+      const currentSub = data.find((sub) => sub.id.toString() === id);
+      if (currentSub) {
+        let parsedSkills = [];
+        if (Array.isArray(currentSub.skills)) {
+          parsedSkills = currentSub.skills;
+        } else if (
+          typeof currentSub.skills === "string" &&
+          currentSub.skills.trim() !== ""
+        ) {
+          parsedSkills = currentSub.skills.split(",").map((s) => s.trim());
+        }
+
+        const predefinedEdu = [
+          "HSC",
+          "SSC",
+          "Bachelor's Degree",
+          "Master's Degree",
+          "PhD",
+        ];
+        const isPredefined = predefinedEdu.includes(currentSub.education);
+
+        // Smart phone splitting logic from saved format (e.g. "+91 9876543210")
+        let rawCountryCode = "+91";
+        let rawCustomCountryCode = "";
+        let rawPhone = currentSub.phone || "";
+
+        if (currentSub.phone) {
+          const parts = currentSub.phone.trim().split(" ");
+          if (parts.length > 1 && parts[0].startsWith("+")) {
+            const potentialCode = parts[0];
+            const supportedStandardCodes = ["+91", "+1", "+44", "+61", "+81"];
+            if (supportedStandardCodes.includes(potentialCode)) {
+              rawCountryCode = potentialCode;
+            } else {
+              rawCountryCode = "Other";
+              rawCustomCountryCode = potentialCode;
+            }
+            rawPhone = parts.slice(1).join("");
+          }
+        }
+
+        setFormData({
+          fullName: currentSub.fullName || "",
+          email: currentSub.email || "",
+          countryCode: rawCountryCode,
+          customCountryCode: rawCustomCountryCode,
+          phone: rawPhone.replace(/\D/g, ""),
+          department: currentSub.department || "",
+          designation: currentSub.designation || "",
+          gender: currentSub.gender || "",
+          education: isPredefined
+            ? currentSub.education
+            : currentSub.education
+            ? "Other"
+            : "",
+          customEducation: isPredefined ? "" : currentSub.education || "",
+          skills: parsedSkills,
+          address: currentSub.address || "",
+          description: currentSub.description || "",
+          dateOfSubmission: currentSub.dateOfSubmission || "",
+        });
+      } else {
+        toast.error("Submission not found.");
+      }
+    } catch (err) {
+      toast.error("Failed to load submission details.");
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -39,9 +117,9 @@ export default function CreateForm() {
       }
     }
 
-    // Strictly enforce 10 digits only for the phone field
+    // Allow digits only for the phone field
     if (name === "phone") {
-      const numericValue = value.replace(/\D/g, "").slice(0, 10);
+      const numericValue = value.replace(/\D/g, "");
       setFormData({ ...formData, phone: numericValue });
       return;
     }
@@ -82,16 +160,6 @@ export default function CreateForm() {
       return;
     }
 
-    if (formData.phone.length !== 10) {
-      toast.warn("Phone number must be strictly 10 digits.");
-      return;
-    }
-
-    if (/^(\d)\1+$/.test(formData.phone)) {
-      toast.warn("Please enter a valid phone number, not repeated digits.");
-      return;
-    }
-
     const activeCountryCode =
       formData.countryCode === "Other"
         ? formData.customCountryCode.trim()
@@ -99,6 +167,32 @@ export default function CreateForm() {
 
     if (formData.countryCode === "Other" && !activeCountryCode) {
       toast.warn("Please specify your custom country code.");
+      return;
+    }
+
+    // Format country code to make sure it includes '+'
+    const formattedCountryCode = activeCountryCode.startsWith("+")
+      ? activeCountryCode
+      : `+${activeCountryCode}`;
+
+    // 1. Strictly enforce 10 digits for Indian numbers
+    if (formattedCountryCode === "+91") {
+      if (formData.phone.length !== 10) {
+        toast.warn("Phone number must be of 10 digits.");
+        return;
+      }
+    }
+
+    const fullPhoneNumber = `${formattedCountryCode}${formData.phone}`;
+
+    // 2. Global PAN-world validation using libphonenumber-js
+    if (!isValidPhoneNumber(fullPhoneNumber)) {
+      toast.warn("Please enter a valid phone number for the selected region.");
+      return;
+    }
+
+    if (/^(\d)\1+$/.test(formData.phone)) {
+      toast.warn("Please enter a valid phone number, not repeated digits.");
       return;
     }
 
@@ -120,29 +214,30 @@ export default function CreateForm() {
         ? formData.skills.join(", ")
         : formData.skills;
 
-      const fullPhoneNumber = `${activeCountryCode} ${formData.phone}`;
+      // Store complete formatted phone number
+      const displayPhoneNumber = `${formattedCountryCode} ${formData.phone}`;
 
-      const newRecord = {
+      const updatedRecord = {
         ...formData,
-        phone: fullPhoneNumber,
+        phone: displayPhoneNumber,
         education: finalEducation,
         skills: formattedSkills,
         userId: currentUser.id,
         username: currentUser.username,
       };
 
-      await createSubmission(newRecord);
+      await updateSubmission(id, updatedRecord);
 
       logActivity(
-        "FORM_CREATE",
-        `Created new form submission for: ${formData.fullName}`,
+        "FORM_UPDATE",
+        `Updated submission record for: ${formData.fullName || "User Record"}`,
         currentUser?.username || "User",
       );
 
-      toast.success("Form submitted successfully!");
+      toast.success("Record updated successfully");
       navigate("/user-dashboard");
     } catch (err) {
-      toast.error("Failed to create submission. Please try again.");
+      toast.error("Failed to update submission. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -175,10 +270,10 @@ export default function CreateForm() {
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#2e1048]/95 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-2xl mb-6 border border-purple-500/30 relative z-10 gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-wide">
-            New Submission Form
+            Edit Submission Form
           </h1>
           <p className="text-xs sm:text-sm text-purple-300/80 mt-0.5">
-            Fill out user record information accurately
+            Update user record details
           </p>
         </div>
         <div>
@@ -272,12 +367,10 @@ export default function CreateForm() {
                 onChange={handleChange}
                 required
                 autoComplete="new-password"
-                maxLength={10}
-                placeholder="10-digit number"
+                placeholder="Phone number"
                 className={`${formData.countryCode === "Other" ? "sm:col-span-1" : "sm:col-span-2"} w-full px-4 py-3 bg-[#240b3b] border border-purple-500/40 rounded-xl text-sm text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner`}
               />
             </div>
-            
           </div>
 
           {/* Department */}
@@ -486,12 +579,12 @@ export default function CreateForm() {
             />
           </div>
 
-          {/* Submit Button */}
+          {/* Update Button */}
           <div className="md:col-span-2 pt-2">
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-3.5 bg-linear-to-r from-orange-500 to-pink-600 hover:opacity-95 text-white font-bold rounded-xl transition duration-150 shadow-lg text-sm tracking-widest uppercase flex items-center justify-center space-x-2 cursor-pointer ${
+              className={`w-full py-3.5 bg-gradient-to-r from-orange-500 to-pink-600 hover:opacity-95 text-white font-bold rounded-xl transition duration-150 shadow-lg text-sm tracking-widest uppercase flex items-center justify-center space-x-2 cursor-pointer ${
                 loading ? "opacity-75 cursor-not-allowed" : ""
               }`}
             >
@@ -517,10 +610,10 @@ export default function CreateForm() {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  <span>Submitting...</span>
+                  <span>Updating...</span>
                 </>
               ) : (
-                <span>Submit Record</span>
+                <span>Update Record</span>
               )}
             </button>
           </div>
