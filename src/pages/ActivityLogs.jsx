@@ -1,9 +1,41 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import ReactDOM from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const API_URL = "https://6a90168dff2484963a5db61a.mockapi.io/activity-logs";
+
+function StatCard({ label, value }) {
+  return (
+    <div className="bg-linear-to-br from-purple-700/60 to-purple-900/60 border border-purple-500/30 rounded-2xl p-4 shadow-lg">
+      <p className="text-[11px] text-purple-300/80 uppercase tracking-wide font-bold">{label}</p>
+      <p className="text-2xl font-extrabold text-white mt-1.5">{value}</p>
+    </div>
+  );
+}
+
+function getActionBadgeStyle(action) {
+  const a = (action || "").toUpperCase();
+  if (a.includes("LOGIN")) {
+    return "bg-green-500/15 text-green-300 border-green-500/30";
+  }
+  if (a.includes("LOGOUT")) {
+    return "bg-red-500/15 text-red-300 border-red-500/30";
+  }
+  if (a.includes("REGISTER")) {
+    return "bg-purple-500/15 text-purple-200 border-purple-400/30";
+  }
+  if (a.includes("DELETE")) {
+    return "bg-red-500/15 text-red-300 border-red-500/30";
+  }
+  if (a.includes("CREATE")) {
+    return "bg-blue-500/15 text-blue-300 border-blue-500/30";
+  }
+  if (a.includes("UPDATE")) {
+    return "bg-yellow-500/15 text-yellow-300 border-yellow-500/30";
+  }
+  return "bg-[#1b082d]/70 text-purple-200 border-purple-500/40";
+}
 
 export default function ActivityLogs() {
   const navigate = useNavigate();
@@ -11,7 +43,10 @@ export default function ActivityLogs() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [deleteLogId, setDeleteLogId] = useState(null);
   const [selectedLogs, setSelectedLogs] = useState([]);
-  const [isSelectMode, setIsSelectMode] = useState(false); 
+  const [isSelectMode, setIsSelectMode] = useState(false);
+
+  const [actionFilter, setActionFilter] = useState("All");
+  const [userFilter, setUserFilter] = useState("All");
 
   const [currentPage, setCurrentPage] = useState(1);
   const logsPerPage = 5;
@@ -44,10 +79,59 @@ export default function ActivityLogs() {
     return !isAdmin;
   });
 
+  // ---- Stat calculations (based on all actual logs, unaffected by filters) ----
+  const todayDisplayStr = new Date().toLocaleDateString("en-GB"); // "10/09/2026"
+
+  const loginsToday = actualLogs.filter(
+    (log) =>
+      (log.action || "").toUpperCase().includes("LOGIN") &&
+      !(log.action || "").toUpperCase().includes("LOGOUT") &&
+      log.timestamp?.startsWith(todayDisplayStr)
+  ).length;
+
+  const newRegistrations = actualLogs.filter((log) =>
+    (log.action || "").toUpperCase().includes("REGISTER")
+  ).length;
+
+  const deletions = actualLogs.filter((log) =>
+    (log.action || "").toUpperCase().includes("DELETE")
+  ).length;
+  // ---- end stat calculations ----
+
+  // ---- Filter dropdown options, derived from real data ----
+  const actionOptions = useMemo(() => {
+    const unique = [...new Set(actualLogs.map((log) => log.action).filter(Boolean))];
+    return unique.sort();
+  }, [actualLogs]);
+
+  const userOptions = useMemo(() => {
+    const unique = [...new Set(actualLogs.map((log) => log.actor).filter(Boolean))];
+    return unique.sort();
+  }, [actualLogs]);
+  // ---- end filter options ----
+
+  // ---- Apply filters before pagination ----
+  const filteredLogs = actualLogs.filter((log) => {
+    const matchesAction = actionFilter === "All" || log.action === actionFilter;
+    const matchesUser = userFilter === "All" || log.actor === userFilter;
+    return matchesAction && matchesUser;
+  });
+  // ---- end filters ----
+
   const indexOfLastLog = currentPage * logsPerPage;
   const indexOfFirstLog = indexOfLastLog - logsPerPage;
-  const currentLogs = actualLogs.slice(indexOfFirstLog, indexOfLastLog);
-  const totalPages = Math.ceil(actualLogs.length / logsPerPage) || 1;
+  const currentLogs = filteredLogs.slice(indexOfFirstLog, indexOfLastLog);
+  const totalPages = Math.ceil(filteredLogs.length / logsPerPage) || 1;
+
+  const handleActionFilterChange = (e) => {
+    setActionFilter(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleUserFilterChange = (e) => {
+    setUserFilter(e.target.value);
+    setCurrentPage(1);
+  };
 
   const handleCheckboxChange = (id) => {
     setSelectedLogs((prev) =>
@@ -150,6 +234,8 @@ export default function ActivityLogs() {
       setSelectedLogs([]);
       setIsSelectMode(false);
       setCurrentPage(1);
+      setActionFilter("All");
+      setUserFilter("All");
       toast.success("Activity logs cleared successfully!");
     } catch (error) {
       console.error("Error clearing logs:", error);
@@ -203,9 +289,16 @@ export default function ActivityLogs() {
         </div>
       </div>
 
+      {/* Stat cards */}
+      <div className="max-w-7xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 relative z-10">
+        <StatCard label="Total Logs" value={actualLogs.length} />
+        <StatCard label="Logins Today" value={loginsToday} />
+        <StatCard label="New Registrations" value={newRegistrations} />
+        <StatCard label="Deletions" value={deletions} />
+      </div>
 
       <div className="max-w-7xl mx-auto bg-[#2e1048]/95 backdrop-blur-md p-4 sm:p-6 rounded-3xl shadow-2xl border border-purple-500/30 relative z-10">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
           <div>
             <h2 className="text-base sm:text-lg font-bold text-white">Activity Records</h2>
             <p className="text-xs text-purple-300/80">
@@ -241,6 +334,48 @@ export default function ActivityLogs() {
               Clear All Logs
             </button>
           </div>
+        </div>
+
+        {/* Filter dropdowns */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mb-6">
+          <select
+            value={actionFilter}
+            onChange={handleActionFilterChange}
+            className="px-3 py-2 bg-[#1b082d]/70 border border-purple-500/40 rounded-xl text-xs text-purple-100 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-inner [&>option]:bg-[#1b082d] [&>option]:text-white"
+          >
+            <option value="All">All Actions</option>
+            {actionOptions.map((action) => (
+              <option key={action} value={action}>
+                {action}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={userFilter}
+            onChange={handleUserFilterChange}
+            className="px-3 py-2 bg-[#1b082d]/70 border border-purple-500/40 rounded-xl text-xs text-purple-100 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-inner [&>option]:bg-[#1b082d] [&>option]:text-white"
+          >
+            <option value="All">All Users</option>
+            {userOptions.map((user) => (
+              <option key={user} value={user}>
+                {user}
+              </option>
+            ))}
+          </select>
+
+          {(actionFilter !== "All" || userFilter !== "All") && (
+            <button
+              onClick={() => {
+                setActionFilter("All");
+                setUserFilter("All");
+                setCurrentPage(1);
+              }}
+              className="px-3 py-2 bg-[#1b082d]/70 text-purple-300 border border-purple-500/40 rounded-xl text-xs font-bold hover:bg-[#1b082d] transition whitespace-nowrap"
+            >
+              Reset Filters
+            </button>
+          )}
         </div>
 
         <div className="hidden md:block overflow-x-auto">
@@ -294,7 +429,11 @@ export default function ActivityLogs() {
                         </span>
                       </td>
                       <td className="py-3 px-3">
-                        <span className="px-2.5 py-1 bg-[#1b082d]/70 text-purple-200 border border-purple-500/40 rounded-lg text-xs font-bold font-mono inline-block">
+                        <span
+                          className={`px-2.5 py-1 rounded-lg text-xs font-bold font-mono inline-block border ${getActionBadgeStyle(
+                            log.action
+                          )}`}
+                        >
                           {log.action}
                         </span>
                       </td>
@@ -318,14 +457,13 @@ export default function ActivityLogs() {
                     colSpan={isSelectMode ? 6 : 5}
                     className="py-6 text-center text-purple-300/80 text-sm"
                   >
-                    No activity logs recorded yet.
+                    No activity logs match the selected filters.
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
-
 
         <div className="block md:hidden space-y-3">
           {currentLogs.length > 0 ? (
@@ -366,7 +504,11 @@ export default function ActivityLogs() {
                     <span className="px-2 py-0.5 bg-linear-to-r from-orange-500 to-pink-600 text-white rounded-md text-xs font-bold">
                       {log.actor}
                     </span>
-                    <span className="px-2 py-0.5 bg-[#1b082d] text-purple-200 border border-purple-500/40 rounded-md text-xs font-mono font-bold">
+                    <span
+                      className={`px-2 py-0.5 rounded-md text-xs font-mono font-bold border ${getActionBadgeStyle(
+                        log.action
+                      )}`}
+                    >
                       {log.action}
                     </span>
                   </div>
@@ -380,18 +522,18 @@ export default function ActivityLogs() {
             })
           ) : (
             <div className="py-6 text-center text-purple-300/80 text-sm bg-[#1b082d]/50 rounded-2xl border border-purple-500/20">
-              No activity logs recorded yet.
+              No activity logs match the selected filters.
             </div>
           )}
         </div>
       </div>
 
       {/* Pagination Controls */}
-      {actualLogs.length > 0 && (
+      {filteredLogs.length > 0 && (
         <div className="max-w-7xl mx-auto mt-4 px-2 flex flex-col sm:flex-row justify-between items-center text-xs text-white relative z-10 gap-3">
           <p className="text-purple-300/80 text-center sm:text-left">
             Showing {indexOfFirstLog + 1} to{" "}
-            {Math.min(indexOfLastLog, actualLogs.length)} of {actualLogs.length} entries
+            {Math.min(indexOfLastLog, filteredLogs.length)} of {filteredLogs.length} entries
           </p>
 
           <div className="flex items-center space-x-2">
