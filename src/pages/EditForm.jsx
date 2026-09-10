@@ -212,7 +212,7 @@ export default function EditForm() {
         ? formData.skills.join(", ")
         : formData.skills;
 
-      // Store complete formatted phone number
+     
       const displayPhoneNumber = `${formattedCountryCode} ${formData.phone}`;
 
       const updatedRecord = {

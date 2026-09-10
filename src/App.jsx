@@ -12,8 +12,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Setup2FA from './components/Setup2FA';
 import ActivityLogs from "./pages/ActivityLogs";
-
-
+import AdminSubmissions from './pages/AdminSubmissions';
 
 
 export default function App() {
@@ -32,6 +31,7 @@ export default function App() {
         <Route path="/admin/form-details/:id" element={<AdminFormDetails/>} /> 
         <Route path='/setup-2fa' element={<Setup2FA/>} />
         <Route path='/activity-logs' element={<ActivityLogs/>} />
+        <Route path="/admin-submissions" element={<AdminSubmissions />} />
       </Routes>
     </Router>
 
