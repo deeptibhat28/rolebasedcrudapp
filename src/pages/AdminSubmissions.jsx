@@ -1,12 +1,197 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import ReactDOM from "react-dom";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { deleteSubmission, getSubmissions } from "../services/api";
 import { toast } from "react-toastify";
 import { logActivity } from "../utils/logger";
 
+function toIsoDate(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function formatShortDate(iso) {
+  const d = new Date(iso + "T00:00:00");
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+function DateRangePicker({ fromDate, toDate, onApply }) {
+  const [open, setOpen] = useState(false);
+  const [viewDate, setViewDate] = useState(() => {
+    const base = fromDate ? new Date(fromDate + "T00:00:00") : new Date();
+    return new Date(base.getFullYear(), base.getMonth(), 1);
+  });
+  const [tempFrom, setTempFrom] = useState(fromDate);
+  const [tempTo, setTempTo] = useState(toDate);
+
+  const openPicker = () => {
+    setTempFrom(fromDate);
+    setTempTo(toDate);
+    const base = fromDate ? new Date(fromDate + "T00:00:00") : new Date();
+    setViewDate(new Date(base.getFullYear(), base.getMonth(), 1));
+    setOpen(true);
+  };
+
+  const handleDayClick = (dateStr) => {
+    if (!tempFrom || (tempFrom && tempTo)) {
+      setTempFrom(dateStr);
+      setTempTo("");
+    } else if (dateStr < tempFrom) {
+      setTempFrom(dateStr);
+    } else {
+      setTempTo(dateStr);
+    }
+  };
+
+  const handleApply = () => {
+    onApply(tempFrom, tempTo);
+    setOpen(false);
+  };
+
+  const handleCancel = () => setOpen(false);
+
+  const handleClearRange = (e) => {
+    e.stopPropagation();
+    onApply("", "");
+  };
+
+  const changeMonth = (delta) => {
+    setViewDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + delta, 1));
+  };
+
+  const year = viewDate.getFullYear();
+  const month = viewDate.getMonth();
+  const firstDayOfMonth = new Date(year, month, 1);
+  const startWeekday = firstDayOfMonth.getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+  const cells = [];
+  for (let i = 0; i < startWeekday; i++) {
+    cells.push({ day: daysInPrevMonth - startWeekday + 1 + i, current: false });
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    cells.push({ day: d, current: true, dateStr: toIsoDate(new Date(year, month, d)) });
+  }
+  while (cells.length % 7 !== 0) {
+    const overflowDay = cells.length - startWeekday - daysInMonth + 1;
+    cells.push({ day: overflowDay, current: false });
+  }
+
+  const label =
+    fromDate && toDate
+      ? `${formatShortDate(fromDate)} \u2013 ${formatShortDate(toDate)}`
+      : fromDate
+      ? `${formatShortDate(fromDate)} \u2013 ...`
+      : "Date range";
+
+  return (
+    <div className="relative">
+      <button
+        onClick={openPicker}
+        className="flex items-center gap-2 px-3 py-2 bg-[#1b082d]/70 border border-purple-500/40 rounded-xl text-xs text-purple-100 hover:bg-[#1b082d] transition shadow-inner"
+      >
+        <span className="whitespace-nowrap">{label}</span>
+        {fromDate && (
+          <span
+            onClick={handleClearRange}
+            className="text-purple-400 hover:text-white ml-1 leading-none"
+            role="button"
+            aria-label="Clear date range"
+          >
+            &times;
+          </span>
+        )}
+        <span className="text-purple-400">&#9662;</span>
+      </button>
+
+      {open && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={handleCancel}></div>
+          <div className="absolute z-50 top-full mt-2 left-0 bg-[#2e1048] border border-purple-500/40 rounded-2xl shadow-2xl p-4 w-72">
+            <div className="flex items-center justify-between mb-3">
+              <button
+                onClick={() => changeMonth(-1)}
+                className="text-purple-300 hover:text-white px-2 text-sm"
+                aria-label="Previous month"
+              >
+                &#8249;
+              </button>
+              <span className="text-xs font-bold text-white">
+                {viewDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+              </span>
+              <button
+                onClick={() => changeMonth(1)}
+                className="text-purple-300 hover:text-white px-2 text-sm"
+                aria-label="Next month"
+              >
+                &#8250;
+              </button>
+            </div>
+
+            <div className="grid grid-cols-7 gap-1 text-center text-[10px] text-purple-400/70 mb-1">
+              {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
+                <span key={i}>{d}</span>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-7 gap-1 text-center text-xs">
+              {cells.map((cell, idx) => {
+                if (!cell.current) {
+                  return (
+                    <span key={idx} className="py-1.5 text-purple-600/30">
+                      {cell.day}
+                    </span>
+                  );
+                }
+                const isFrom = cell.dateStr === tempFrom;
+                const isTo = cell.dateStr === tempTo;
+                const inRange =
+                  tempFrom && tempTo && cell.dateStr > tempFrom && cell.dateStr < tempTo;
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => handleDayClick(cell.dateStr)}
+                    className={`py-1.5 rounded-lg transition ${
+                      isFrom || isTo
+                        ? "bg-linear-to-r from-orange-500 to-pink-600 text-white font-bold"
+                        : inRange
+                        ? "bg-orange-500/20 text-orange-200"
+                        : "text-purple-100 hover:bg-purple-800/40"
+                    }`}
+                  >
+                    {cell.day}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="flex justify-end gap-2 mt-3 pt-3 border-t border-purple-500/20">
+              <button
+                onClick={handleCancel}
+                className="px-3 py-1.5 text-xs font-bold text-purple-200 border border-purple-500/40 rounded-xl hover:bg-[#1b082d] transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleApply}
+                className="px-3 py-1.5 text-xs font-bold text-white bg-linear-to-r from-orange-500 to-pink-600 rounded-xl hover:opacity-95 transition shadow-lg"
+              >
+                Apply
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function AdminSubmissions() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const currentUser = JSON.parse(localStorage.getItem("user"));
 
   const [submissions, setSubmissions] = useState([]);
@@ -14,7 +199,15 @@ export default function AdminSubmissions() {
   const [deleteId, setDeleteId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
+
+  const [submittedByFilter, setSubmittedByFilter] = useState("All");
+  const [genderFilter, setGenderFilter] = useState("All");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+
+  const dateFilter = searchParams.get("date");
+  const todayStr = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
     if (!currentUser || currentUser.role !== "admin") {
@@ -23,6 +216,11 @@ export default function AdminSubmissions() {
       fetchAllSubmissions();
     }
   }, []);
+
+  // reset to page 1 whenever any filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [dateFilter, submittedByFilter, genderFilter, fromDate, toDate]);
 
   const fetchAllSubmissions = async () => {
     try {
@@ -74,19 +272,75 @@ export default function AdminSubmissions() {
     navigate("/login");
   };
 
-  const filteredSubmissions = submissions.filter((sub) => {
+  const clearDateFilter = () => {
+    const next = new URLSearchParams(searchParams);
+    next.delete("date");
+    setSearchParams(next);
+  };
+
+  const resetAllFilters = () => {
+    setSubmittedByFilter("All");
+    setGenderFilter("All");
+    setFromDate("");
+    setToDate("");
+    setSearchTerm("");
+    clearDateFilter();
+  };
+
+  // ---- Filter dropdown options, derived from real data ----
+  const submittedByOptions = useMemo(() => {
+    const unique = [...new Set(submissions.map((sub) => sub.username).filter(Boolean))];
+    return unique.sort();
+  }, [submissions]);
+
+  const genderOptions = useMemo(() => {
+    const unique = [...new Set(submissions.map((sub) => sub.gender).filter(Boolean))];
+    return unique.sort();
+  }, [submissions]);
+  // ---- end filter options ----
+
+  // "today" quick filter (from the dashboard's Submissions Today card)
+  const dateFilteredSubmissions =
+    dateFilter === "today"
+      ? submissions.filter((sub) => sub.dateOfSubmission === todayStr)
+      : submissions;
+
+  const filteredSubmissions = dateFilteredSubmissions.filter((sub) => {
     const term = searchTerm.toLowerCase();
     const username = (sub.username || "").toLowerCase();
     const fullName = (sub.fullName || "").toLowerCase();
     const email = (sub.email || "").toLowerCase();
     const department = (sub.department || "").toLowerCase();
-    return (
+    const matchesSearch =
       username.includes(term) ||
       fullName.includes(term) ||
       email.includes(term) ||
-      department.includes(term)
+      department.includes(term);
+
+    const matchesSubmittedBy =
+      submittedByFilter === "All" || sub.username === submittedByFilter;
+
+    const matchesGender = genderFilter === "All" || sub.gender === genderFilter;
+
+    const subDate = sub.dateOfSubmission || "";
+    const matchesFromDate = !fromDate || subDate >= fromDate;
+    const matchesToDate = !toDate || subDate <= toDate;
+
+    return (
+      matchesSearch &&
+      matchesSubmittedBy &&
+      matchesGender &&
+      matchesFromDate &&
+      matchesToDate
     );
   });
+
+  const hasActiveFilters =
+    submittedByFilter !== "All" ||
+    genderFilter !== "All" ||
+    fromDate !== "" ||
+    toDate !== "" ||
+    dateFilter === "today";
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -162,13 +416,76 @@ export default function AdminSubmissions() {
           </div>
         </div>
 
+        {/* Filters row */}
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-2 sm:gap-3 mb-4 flex-wrap">
+          <select
+            value={submittedByFilter}
+            onChange={(e) => setSubmittedByFilter(e.target.value)}
+            className="px-3 py-2 bg-[#1b082d]/70 border border-purple-500/40 rounded-xl text-xs text-purple-100 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-inner [&>option]:bg-[#1b082d] [&>option]:text-white"
+          >
+            <option value="All">All Submitters</option>
+            {submittedByOptions.map((username) => (
+              <option key={username} value={username}>
+                {username}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={genderFilter}
+            onChange={(e) => setGenderFilter(e.target.value)}
+            className="px-3 py-2 bg-[#1b082d]/70 border border-purple-500/40 rounded-xl text-xs text-purple-100 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-inner [&>option]:bg-[#1b082d] [&>option]:text-white"
+          >
+            <option value="All">All Genders</option>
+            {genderOptions.map((gender) => (
+              <option key={gender} value={gender}>
+                {gender}
+              </option>
+            ))}
+          </select>
+
+          <DateRangePicker
+            fromDate={fromDate}
+            toDate={toDate}
+            onApply={(from, to) => {
+              setFromDate(from);
+              setToDate(to);
+            }}
+          />
+
+          {hasActiveFilters && (
+            <button
+              onClick={resetAllFilters}
+              className="px-3 py-2 bg-[#1b082d]/70 text-purple-300 border border-purple-500/40 rounded-xl text-xs font-bold hover:bg-[#1b082d] transition whitespace-nowrap"
+            >
+              Reset Filters
+            </button>
+          )}
+        </div>
+
+        {dateFilter === "today" && (
+          <div className="mb-4 flex items-center gap-2">
+            <span className="px-3 py-1.5 bg-orange-500/20 text-orange-300 border border-orange-500/30 rounded-xl text-xs font-bold">
+              Showing: Today's submissions only
+            </span>
+            <button
+              onClick={clearDateFilter}
+              className="px-3 py-1.5 bg-[#1b082d]/70 text-purple-200 border border-purple-500/40 rounded-xl text-xs font-bold hover:bg-[#1b082d] transition"
+            >
+              Clear
+            </button>
+          </div>
+        )}
+
         {submissions.length === 0 ? (
           <p className="text-purple-300/80 text-sm py-6 text-center">
             No submissions found from any users yet.
           </p>
         ) : filteredSubmissions.length === 0 ? (
           <p className="text-purple-300/80 text-sm text-center py-6">
-            No matching submissions found for "{searchTerm}".
+            {hasActiveFilters
+              ? "No submissions match the selected filters."
+              : `No matching submissions found for "${searchTerm}".`}
           </p>
         ) : (
           <>
@@ -181,7 +498,7 @@ export default function AdminSubmissions() {
                     <th className="pb-3 px-2">Email</th>
                     <th className="pb-3 px-2">Phone</th>
                     <th className="pb-3 px-2">Gender</th>
-                    <th className="pb-3 px-2">Date</th>
+                    <th className="pb-3 px-2">Submitted Date</th>
                     <th className="pb-3 px-2 text-right pr-6">Actions</th>
                   </tr>
                 </thead>

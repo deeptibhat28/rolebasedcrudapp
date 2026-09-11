@@ -2,8 +2,17 @@ import axios from 'axios';
 const API_URL = 'https://6a90168dff2484963a5db61a.mockapi.io';
 
 export const loginUser = async (username, password) => {
-    const response = await axios.get(`${API_URL}/users?username=${username}&password=${password}`);
-    return response.data[0];
+    const response = await axios.get(`${API_URL}/users`);
+    const users = response.data;
+    const user = users.find(
+        (u) => u && u.username === username && u.password === password
+    );
+
+    if (!user) {
+        throw new Error("Invalid username or password");
+    }
+
+    return user;
 };
 
 export const registerUser = async (userData) => {

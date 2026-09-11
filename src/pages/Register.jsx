@@ -26,9 +26,7 @@ export default function Register() {
 
     try {
       const users = await getUsers();
-      const existingUser = users.find(
-        (user) => user.username.toLowerCase() === username.toLowerCase(),
-      );
+      const existingUser = users.find((u)=> u && u.username && u.username.toLowerCase() === username.toLowerCase());
 
       if (existingUser) {
         toast.error(

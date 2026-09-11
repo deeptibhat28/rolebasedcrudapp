@@ -98,17 +98,28 @@ export default function CreateForm() {
       ? activeCountryCode
       : `+${activeCountryCode}`;
 
-    // 1. Strictly enforce 10 digits for Indian numbers
+    
     if (formattedCountryCode === "+91") {
       if (formData.phone.length !== 10) {
-        toast.warn("Indian phone number must be strictly 10 digits.");
+        toast.warn("Phone number must be of 10 digits.");
         return;
       }
     }
 
+    if (!/^[6-9]\d{9}$/.test(formData.phone)) {
+    toast.warn("Please enter a valid  phone number for this country code.");
+    return;
+  }
+
+  const invalidNumbers = ["0123456789", "9876543210", "1234567890"];
+      if (invalidNumbers.includes(formData.phone)) {
+        toast.warn("Please enter a valid phone number.");
+        return;
+      }
+
     const fullPhoneNumber = `${formattedCountryCode}${formData.phone}`;
 
-    // 2. Global PAN-world validation using libphonenumber-js
+    // Global PAN-world validation using libphonenumber-js
     if (!isValidPhoneNumber(fullPhoneNumber)) {
       toast.warn("Please enter a valid phone number for the selected region.");
       return;

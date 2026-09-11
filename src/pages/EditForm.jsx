@@ -92,8 +92,8 @@ export default function EditForm() {
           education: isPredefined
             ? currentSub.education
             : currentSub.education
-            ? "Other"
-            : "",
+              ? "Other"
+              : "",
           customEducation: isPredefined ? "" : currentSub.education || "",
           skills: parsedSkills,
           address: currentSub.address || "",
@@ -175,15 +175,25 @@ export default function EditForm() {
       ? activeCountryCode
       : `+${activeCountryCode}`;
 
-    // 1. Strictly enforce 10 digits ONLY for Indian numbers (+91)
     if (formattedCountryCode === "+91" && formData.phone.length !== 10) {
       toast.warn("Phone number must be of 10 digits.");
       return;
     }
 
+    if (!/^[6-9]\d{9}$/.test(formData.phone)) {
+      toast.warn("Please enter a valid  phone number for this country code.");
+      return;
+    }
+
+    const invalidNumbers = ["0123456789", "9876543210", "1234567890"];
+    if (invalidNumbers.includes(formData.phone)) {
+      toast.warn("Please enter a valid phone number.");
+      return;
+    }
+
     const fullPhoneNumber = `${formattedCountryCode}${formData.phone}`;
 
-    // 2. Global regional validation using libphonenumber-js for all countries
+    // Global regional validation using libphonenumber-js for all countries
     if (!isValidPhoneNumber(fullPhoneNumber)) {
       toast.warn("Please enter a valid phone number for the selected region.");
       return;
@@ -212,7 +222,6 @@ export default function EditForm() {
         ? formData.skills.join(", ")
         : formData.skills;
 
-     
       const displayPhoneNumber = `${formattedCountryCode} ${formData.phone}`;
 
       const updatedRecord = {
@@ -285,8 +294,11 @@ export default function EditForm() {
       </div>
 
       <div className="max-w-7xl mx-auto bg-[#2e1048]/95 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-2xl border border-purple-500/30 relative z-10">
-        <form onSubmit={handleSubmit} noValidate className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
-          
+        <form
+          onSubmit={handleSubmit}
+          noValidate
+          className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm"
+        >
           {/* Full Name */}
           <div className="md:col-span-2 bg-[#1b082d]/70 p-4 rounded-2xl border border-purple-500/40 shadow-inner">
             <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-1">
@@ -615,7 +627,6 @@ export default function EditForm() {
               )}
             </button>
           </div>
-
         </form>
       </div>
     </div>

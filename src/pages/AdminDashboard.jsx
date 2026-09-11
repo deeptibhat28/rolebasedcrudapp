@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { getSubmissions, getUsers } from "../services/api";
 import { toast } from "react-toastify";
@@ -16,11 +16,92 @@ import {
 
 ChartJS.register(LineElement, PointElement, ArcElement, CategoryScale, LinearScale, Tooltip, Legend);
 
-function StatCard({ label, value }) {
+function StatCard({ label, value, onClick }) {
   return (
-    <div className="bg-linear-to-br from-purple-700/60 to-purple-900/60 border border-purple-500/30 rounded-2xl p-5 shadow-lg">
+    <div
+      onClick={onClick}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={(e) => {
+        if (onClick && (e.key === "Enter" || e.key === " ")) {
+          e.preventDefault();
+          onClick();
+        }
+      }}
+      className={`bg-linear-to-br from-purple-700/60 to-purple-900/60 border border-purple-500/30 rounded-2xl p-5 shadow-lg transition duration-200 ${
+        onClick
+          ? "cursor-pointer hover:border-purple-400/60 hover:from-purple-700/80 hover:to-purple-900/80 hover:-translate-y-0.5"
+          : ""
+      }`}
+    >
       <p className="text-xs text-purple-300/80 uppercase tracking-wide font-bold">{label}</p>
       <p className="text-3xl font-extrabold text-white mt-2">{value}</p>
+    </div>
+  );
+}
+
+function UsersModal({ users, onClose }) {
+  const [visibleCount, setVisibleCount] = useState(15);
+  const scrollRef = useRef(null);
+
+  const handleScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 50) {
+      setVisibleCount((prev) => Math.min(prev + 15, users.length));
+    }
+  };
+
+  const visibleUsers = users.slice(0, visibleCount);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-[#2e1048] border border-purple-500/30 rounded-3xl shadow-2xl w-full max-w-md max-h-[80vh] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between p-5 border-b border-purple-500/30">
+          <h3 className="text-lg font-extrabold text-white">Total Users ({users.length})</h3>
+          <button
+            onClick={onClose}
+            className="text-purple-300 hover:text-white text-xl leading-none px-2"
+            aria-label="Close"
+          >
+            &times;
+          </button>
+        </div>
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="overflow-y-auto p-5 space-y-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-[#2e1048] [&::-webkit-scrollbar-thumb]:bg-purple-900/60 [&::-webkit-scrollbar-thumb]:rounded-full"
+        >
+          {users.length === 0 ? (
+            <p className="text-purple-300/70 text-sm">No users found.</p>
+          ) : (
+            <>
+              {visibleUsers.map((u) => (
+                <div
+                  key={u.id}
+                  className="flex items-center justify-between bg-[#1b082d]/70 border border-purple-500/20 rounded-xl px-4 py-2.5"
+                >
+                  <span className="text-white font-semibold text-sm">{u.username}</span>
+                  {u.email && (
+                    <span className="text-purple-300/70 text-xs">{u.email}</span>
+                  )}
+                </div>
+              ))}
+              {visibleCount < users.length && (
+                <p className="text-center text-purple-400/60 text-xs py-2">
+                  Loading more...
+                </p>
+              )}
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -84,6 +165,7 @@ export default function AdminDashboard() {
 
   const [submissions, setSubmissions] = useState([]);
   const [users, setUsers] = useState([]);
+  const [showUsersModal, setShowUsersModal] = useState(false);
 
   useEffect(() => {
     if (!currentUser || currentUser.role !== "admin") {
@@ -112,8 +194,11 @@ export default function AdminDashboard() {
     navigate("/");
   };
 
+  const nonAdminUsers = users.filter((u) => {
+    return u && u.id && u.username && u.role !== "admin";
+  });
   const totalSubmissions = submissions.length;
-  const totalUsers = users.filter((u) => u.role !== "admin").length;
+  const totalUsers = nonAdminUsers.length;
 
   const todayStr = new Date().toISOString().split("T")[0];
   const submissionsToday = submissions.filter(
@@ -188,9 +273,21 @@ export default function AdminDashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 relative z-10">
-        <StatCard label="Total Users" value={totalUsers} />
-        <StatCard label="Total Submissions" value={totalSubmissions} />
-        <StatCard label="Submissions Today" value={submissionsToday} />
+        <StatCard
+          label="Total Users"
+          value={totalUsers}
+          onClick={() => setShowUsersModal(true)}
+        />
+        <StatCard
+          label="Total Submissions"
+          value={totalSubmissions}
+          onClick={() => navigate("/admin-submissions")}
+        />
+        <StatCard
+          label="Submissions Today"
+          value={submissionsToday}
+          onClick={() => navigate("/admin-submissions?date=today")}
+        />
       </div>
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
@@ -207,6 +304,10 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
+
+      {showUsersModal && (
+        <UsersModal users={nonAdminUsers} onClose={() => setShowUsersModal(false)} />
+      )}
     </div>
   );
 }

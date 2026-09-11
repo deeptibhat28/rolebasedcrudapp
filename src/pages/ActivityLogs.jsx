@@ -1,15 +1,105 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import ReactDOM from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const API_URL = "https://6a90168dff2484963a5db61a.mockapi.io/activity-logs";
 
-function StatCard({ label, value }) {
+function StatCard({ label, value, onClick }) {
   return (
-    <div className="bg-linear-to-br from-purple-700/60 to-purple-900/60 border border-purple-500/30 rounded-2xl p-4 shadow-lg">
+    <div
+      onClick={onClick}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={(e) => {
+        if (onClick && (e.key === "Enter" || e.key === " ")) {
+          e.preventDefault();
+          onClick();
+        }
+      }}
+      className={`bg-linear-to-br from-purple-700/60 to-purple-900/60 border border-purple-500/30 rounded-2xl p-4 shadow-lg transition duration-200 ${
+        onClick
+          ? "cursor-pointer hover:border-purple-400/60 hover:from-purple-700/80 hover:to-purple-900/80 hover:-translate-y-0.5"
+          : ""
+      }`}
+    >
       <p className="text-[11px] text-purple-300/80 uppercase tracking-wide font-bold">{label}</p>
       <p className="text-2xl font-extrabold text-white mt-1.5">{value}</p>
+    </div>
+  );
+}
+
+function RegistrationsModal({ logs, onClose }) {
+  const [visibleCount, setVisibleCount] = useState(15);
+  const scrollRef = useRef(null);
+
+  const handleScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 50) {
+      setVisibleCount((prev) => Math.min(prev + 15, logs.length));
+    }
+  };
+
+  const visibleLogs = logs.slice(0, visibleCount);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-[#2e1048] border border-purple-500/30 rounded-3xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between p-5 border-b border-purple-500/30">
+          <h3 className="text-lg font-extrabold text-white">
+            New Registrations ({logs.length})
+          </h3>
+          <button
+            onClick={onClose}
+            className="text-purple-300 hover:text-white text-xl leading-none px-2"
+            aria-label="Close"
+          >
+            &times;
+          </button>
+        </div>
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="overflow-y-auto p-5 space-y-2"
+        >
+          {logs.length === 0 ? (
+            <p className="text-purple-300/70 text-sm">No registrations found.</p>
+          ) : (
+            <>
+              {visibleLogs.map((log) => (
+                <div
+                  key={log.actor}
+                  className="flex items-center justify-between bg-[#1b082d]/70 border border-purple-500/20 rounded-xl px-4 py-2.5 gap-3"
+                >
+                  <div className="min-w-0">
+                    <span className="text-white font-semibold text-sm block truncate">
+                      {log.actor}
+                    </span>
+                    <span className="text-purple-300/70 text-xs block truncate">
+                      {log.details}
+                    </span>
+                  </div>
+                  <span className="text-purple-300/70 text-xs whitespace-nowrap shrink-0">
+                    {log.timestamp}
+                  </span>
+                </div>
+              ))}
+              {visibleCount < logs.length && (
+                <p className="text-center text-purple-400/60 text-xs py-2">
+                  Loading more...
+                </p>
+              )}
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -47,9 +137,11 @@ export default function ActivityLogs() {
 
   const [actionFilter, setActionFilter] = useState("All");
   const [userFilter, setUserFilter] = useState("All");
+  const [showLoginsTodayOnly, setShowLoginsTodayOnly] = useState(false);
+  const [showRegistrationsModal, setShowRegistrationsModal] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const logsPerPage = 5;
+  const logsPerPage = 10;
 
   const loadLogs = async () => {
     try {
@@ -71,6 +163,11 @@ export default function ActivityLogs() {
     };
   }, []);
 
+  // reset to page 1 whenever the quick date/login filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [showLoginsTodayOnly]);
+
   const actualLogs = logs.filter((item) => {
     if (!item.action) return false;
     const isAdmin =
@@ -82,20 +179,17 @@ export default function ActivityLogs() {
   // ---- Stat calculations (based on all actual logs, unaffected by filters) ----
   const todayDisplayStr = new Date().toLocaleDateString("en-GB"); // "10/09/2026"
 
-  const loginsToday = actualLogs.filter(
-    (log) =>
-      (log.action || "").toUpperCase().includes("LOGIN") &&
-      !(log.action || "").toUpperCase().includes("LOGOUT") &&
-      log.timestamp?.startsWith(todayDisplayStr)
-  ).length;
+  const isLoginTodayLog = (log) =>
+    (log.action || "").toUpperCase().includes("LOGIN") &&
+    !(log.action || "").toUpperCase().includes("LOGOUT") &&
+    log.timestamp?.startsWith(todayDisplayStr);
 
-  const newRegistrations = actualLogs.filter((log) =>
+  const loginsToday = actualLogs.filter(isLoginTodayLog).length;
+
+  const registrationLogs = actualLogs.filter((log) =>
     (log.action || "").toUpperCase().includes("REGISTER")
-  ).length;
-
-  const deletions = actualLogs.filter((log) =>
-    (log.action || "").toUpperCase().includes("DELETE")
-  ).length;
+  );
+  const newRegistrations = registrationLogs.length;
   // ---- end stat calculations ----
 
   // ---- Filter dropdown options, derived from real data ----
@@ -114,7 +208,8 @@ export default function ActivityLogs() {
   const filteredLogs = actualLogs.filter((log) => {
     const matchesAction = actionFilter === "All" || log.action === actionFilter;
     const matchesUser = userFilter === "All" || log.actor === userFilter;
-    return matchesAction && matchesUser;
+    const matchesLoginToday = !showLoginsTodayOnly || isLoginTodayLog(log);
+    return matchesAction && matchesUser && matchesLoginToday;
   });
   // ---- end filters ----
 
@@ -236,6 +331,7 @@ export default function ActivityLogs() {
       setCurrentPage(1);
       setActionFilter("All");
       setUserFilter("All");
+      setShowLoginsTodayOnly(false);
       toast.success("Activity logs cleared successfully!");
     } catch (error) {
       console.error("Error clearing logs:", error);
@@ -290,11 +386,18 @@ export default function ActivityLogs() {
       </div>
 
       {/* Stat cards */}
-      <div className="max-w-7xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 relative z-10">
+      <div className="max-w-7xl mx-auto grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-6 relative z-10">
         <StatCard label="Total Logs" value={actualLogs.length} />
-        <StatCard label="Logins Today" value={loginsToday} />
-        <StatCard label="New Registrations" value={newRegistrations} />
-        <StatCard label="Deletions" value={deletions} />
+        <StatCard
+          label="Logins Today"
+          value={loginsToday}
+          onClick={() => setShowLoginsTodayOnly(true)}
+        />
+        <StatCard
+          label="New Registrations"
+          value={newRegistrations}
+          onClick={() => setShowRegistrationsModal(true)}
+        />
       </div>
 
       <div className="max-w-7xl mx-auto bg-[#2e1048]/95 backdrop-blur-md p-4 sm:p-6 rounded-3xl shadow-2xl border border-purple-500/30 relative z-10">
@@ -337,7 +440,7 @@ export default function ActivityLogs() {
         </div>
 
         {/* Filter dropdowns */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mb-6">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mb-4">
           <select
             value={actionFilter}
             onChange={handleActionFilterChange}
@@ -377,6 +480,20 @@ export default function ActivityLogs() {
             </button>
           )}
         </div>
+
+        {showLoginsTodayOnly && (
+          <div className="mb-6 flex items-center gap-2">
+            <span className="px-3 py-1.5 bg-orange-500/20 text-orange-300 border border-orange-500/30 rounded-xl text-xs font-bold">
+              Showing: Today's logins only
+            </span>
+            <button
+              onClick={() => setShowLoginsTodayOnly(false)}
+              className="px-3 py-1.5 bg-[#1b082d]/70 text-purple-200 border border-purple-500/40 rounded-xl text-xs font-bold hover:bg-[#1b082d] transition"
+            >
+              Clear
+            </button>
+          </div>
+        )}
 
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
@@ -603,6 +720,13 @@ export default function ActivityLogs() {
           </div>,
           document.body
         )}
+
+      {showRegistrationsModal && (
+        <RegistrationsModal
+          logs={registrationLogs}
+          onClose={() => setShowRegistrationsModal(false)}
+        />
+      )}
     </div>
   );
 }
