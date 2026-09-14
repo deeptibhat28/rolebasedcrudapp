@@ -13,6 +13,8 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { useTheme } from "../context/ThemeContext";
+import ThemeToggle from "../components/ThemeToggle";
 
 ChartJS.register(LineElement, PointElement, ArcElement, CategoryScale, LinearScale, Tooltip, Legend);
 
@@ -28,14 +30,14 @@ function StatCard({ label, value, onClick }) {
           onClick();
         }
       }}
-      className={`bg-linear-to-br from-purple-700/60 to-purple-900/60 border border-purple-500/30 rounded-2xl p-5 shadow-lg transition duration-200 ${
+       className={`bg-white border border-blue-100 dark:bg-purple-900/60 dark:border-purple-500/30 rounded-2xl p-4 shadow-lg transition duration-200 group ${
         onClick
-          ? "cursor-pointer hover:border-purple-400/60 hover:from-purple-700/80 hover:to-purple-900/80 hover:-translate-y-0.5"
+          ? "cursor-pointer hover:bg-blue-500 hover:border-blue-500 hover:-translate-y-0.5 dark:hover:border-purple-400/60 dark:hover:bg-purple-900/80"
           : ""
       }`}
     >
-      <p className="text-xs text-purple-300/80 uppercase tracking-wide font-bold">{label}</p>
-      <p className="text-3xl font-extrabold text-white mt-2">{value}</p>
+      <p className="text-[11px] text-blue-600/70 group-hover:text-white dark:text-purple-300/80 uppercase tracking-wide font-bold transition duration-200">{label}</p>
+      <p className="text-2xl font-extrabold text-gray-900 group-hover:text-white dark:text-white mt-1.5 transition duration-200">{value}</p>
     </div>
   );
 }
@@ -60,14 +62,14 @@ function UsersModal({ users, onClose }) {
       onClick={onClose}
     >
       <div
-        className="bg-[#2e1048] border border-purple-500/30 rounded-3xl shadow-2xl w-full max-w-md max-h-[80vh] flex flex-col"
+        className="bg-white dark:bg-[#2e1048] border border-blue-100 dark:border-purple-500/30 rounded-3xl shadow-2xl w-full max-w-md max-h-[80vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-5 border-b border-purple-500/30">
-          <h3 className="text-lg font-extrabold text-white">Total Users ({users.length})</h3>
+        <div className="flex items-center justify-between p-5 border-b border-blue-100 dark:border-purple-500/30">
+          <h3 className="text-lg font-extrabold text-gray-900 dark:text-white">Total Users ({users.length})</h3>
           <button
             onClick={onClose}
-            className="text-purple-300 hover:text-white text-xl leading-none px-2"
+            className="text-gray-400 hover:text-blue-600 dark:text-purple-300 dark:hover:text-white text-xl leading-none px-2"
             aria-label="Close"
           >
             &times;
@@ -76,25 +78,25 @@ function UsersModal({ users, onClose }) {
         <div
           ref={scrollRef}
           onScroll={handleScroll}
-          className="overflow-y-auto p-5 space-y-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-[#2e1048] [&::-webkit-scrollbar-thumb]:bg-purple-900/60 [&::-webkit-scrollbar-thumb]:rounded-full"
+          className="overflow-y-auto p-5 space-y-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-blue-50 dark:[&::-webkit-scrollbar-track]:bg-[#2e1048] [&::-webkit-scrollbar-thumb]:bg-blue-200 dark:[&::-webkit-scrollbar-thumb]:bg-purple-900/60 [&::-webkit-scrollbar-thumb]:rounded-full"
         >
           {users.length === 0 ? (
-            <p className="text-purple-300/70 text-sm">No users found.</p>
+            <p className="text-gray-500 dark:text-purple-300/70 text-sm">No users found.</p>
           ) : (
             <>
               {visibleUsers.map((u) => (
                 <div
                   key={u.id}
-                  className="flex items-center justify-between bg-[#1b082d]/70 border border-purple-500/20 rounded-xl px-4 py-2.5"
+                  className="flex items-center justify-between bg-blue-50/60 hover:bg-blue-50 dark:bg-[#1b082d]/70 border border-blue-100 dark:border-purple-500/20 rounded-xl px-4 py-2.5 transition duration-150"
                 >
-                  <span className="text-white font-semibold text-sm">{u.username}</span>
+                  <span className="text-gray-900 dark:text-white font-semibold text-sm">{u.username}</span>
                   {u.email && (
-                    <span className="text-purple-300/70 text-xs">{u.email}</span>
+                    <span className="text-blue-600/70 dark:text-purple-300/70 text-xs">{u.email}</span>
                   )}
                 </div>
               ))}
               {visibleCount < users.length && (
-                <p className="text-center text-purple-400/60 text-xs py-2">
+                <p className="text-center text-blue-400 dark:text-purple-400/60 text-xs py-2">
                   Loading more...
                 </p>
               )}
@@ -139,7 +141,7 @@ function getSubmissionsByDate(submissions) {
   };
 }
 
-function getGenderDistribution(submissions) {
+function getGenderDistribution(submissions, theme) {
   const counts = {};
   submissions.forEach((sub) => {
     const g = sub.gender || "Unknown";
@@ -152,7 +154,7 @@ function getGenderDistribution(submissions) {
       {
         data: entries.map(([, value]) => value),
         backgroundColor: ["#e0723c", "#c94f82", "#7f77dd", "#888780"],
-        borderColor: "#2e1048",
+        borderColor: theme === "dark" ? "#2e1048" : "#ffffff",
         borderWidth: 2,
       },
     ],
@@ -161,6 +163,7 @@ function getGenderDistribution(submissions) {
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const { theme } = useTheme();
   const currentUser = JSON.parse(localStorage.getItem("user"));
 
   const [submissions, setSubmissions] = useState([]);
@@ -206,17 +209,21 @@ export default function AdminDashboard() {
   ).length;
 
   const lineData = getSubmissionsByDate(submissions);
-  const pieData = getGenderDistribution(submissions);
+  const pieData = getGenderDistribution(submissions, theme);
+
+  const axisTextColor = theme === "dark" ? "#c9b8e8" : "#5b7fa6";
+  const gridLineColor = theme === "dark" ? "rgba(255,255,255,0.08)" : "rgba(59,130,246,0.08)";
+  const legendTextColor = theme === "dark" ? "#e8dcf7" : "#3a5a7a";
 
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: { legend: { display: false } },
     scales: {
-      x: { ticks: { color: "#c9b8e8" }, grid: { display: false } },
+      x: { ticks: { color: axisTextColor }, grid: { display: false } },
       y: {
-        ticks: { color: "#c9b8e8", stepSize: 1, precision: 0 },
-        grid: { color: "rgba(255,255,255,0.08)" },
+        ticks: { color: axisTextColor, stepSize: 1, precision: 0 },
+        grid: { color: gridLineColor },
         beginAtZero: true,
       },
     },
@@ -225,47 +232,55 @@ export default function AdminDashboard() {
   const pieOptions = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: { legend: { labels: { color: "#e8dcf7" } } },
+    plugins: { legend: { labels: { color: legendTextColor } } },
   };
 
   return (
     <div
-      className="min-h-screen w-full bg-[#240b3b] px-4 sm:px-6 py-6 sm:py-8 relative overflow-hidden text-white font-sans"
-      style={{
-        backgroundImage:
-          "radial-gradient(circle at 20% 30%, rgba(105, 30, 150, 0.45) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(190, 40, 110, 0.35) 0%, transparent 50%), #240b3b",
-      }}
+            className="min-h-screen w-full bg-blue-50 dark:bg-[#240b3b] px-4 sm:px-6 py-6 sm:py-8 relative overflow-hidden  text-gray-900 dark:text-white font-sans transition-colors duration-200"
+      style={
+        theme === "dark"
+          ? {
+              backgroundImage:
+                "radial-gradient(circle at 20% 30%, rgba(105, 30, 150, 0.45) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(190, 40, 110, 0.35) 0%, transparent 50%), #240b3b",
+            }
+          : {
+              backgroundImage:
+                "radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.06) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(96, 165, 250, 0.06) 0%, transparent 50%)",
+            }
+      }
     >
-      <div className="absolute -top-32 -left-32 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-pink-600/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute -top-32 -left-32 w-96 h-96 bg-blue-200/20 dark:bg-purple-600/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-blue-300/20 dark:bg-pink-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#2e1048]/95 backdrop-blur-md p-5 sm:p-6 rounded-3xl shadow-2xl mb-6 border border-purple-500/30 relative z-10 gap-4">
+      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center  bg-white/95  dark:bg-[#2e1048]/95 backdrop-blur-md p-5 sm:p-6 rounded-3xl shadow-2xl mb-6  dark:border-purple-500/30 relative z-10 gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-wide">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white tracking-wide">
             Admin Control Panel
           </h1>
-          <p className="text-xs sm:text-sm text-purple-300/80 mt-0.5">
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-purple-300/80 mt-0.5">
             Logged in as Administrator:{" "}
-            <span className="font-semibold text-base sm:text-lg text-orange-400">{currentUser?.username}</span>
+            <span className="font-semibold text-base sm:text-lg text-orange-500 dark:text-orange-400">{currentUser?.username}</span>
           </p>
         </div>
 
         <div className="space-x-2 sm:space-x-3 flex items-center w-full sm:w-auto justify-end">
+          <ThemeToggle />
           <button
             onClick={() => navigate("/admin-submissions")}
-            className="px-4 py-2 bg-[#1b082d]/70 text-purple-200 border border-purple-500/40 rounded-xl font-bold text-xs sm:text-sm hover:bg-[#1b082d] transition duration-200 shadow-md"
+            className="px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 dark:bg-[#1b082d]/70 dark:text-purple-200 dark:border-purple-500/40 rounded-xl font-bold text-xs sm:text-sm hover:bg-blue-100 hover:border-blue-300 dark:hover:bg-[#1b082d] transition duration-200 shadow-md"
           >
             All Submissions
           </button>
           <button
             onClick={() => navigate("/activity-logs")}
-            className="px-4 py-2 bg-[#1b082d]/70 text-purple-200 border border-purple-500/40 rounded-xl font-bold text-xs sm:text-sm hover:bg-[#1b082d] transition duration-200 shadow-md"
+            className="px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 dark:bg-[#1b082d]/70 dark:text-purple-200 dark:border-purple-500/40 rounded-xl font-bold text-xs sm:text-sm hover:bg-blue-100 hover:border-blue-300 dark:hover:bg-[#1b082d] transition duration-200 shadow-md"
           >
             Activity Logs
           </button>
           <button
             onClick={handleLogout}
-            className="px-4 py-2 bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl font-bold text-xs sm:text-sm hover:bg-red-500/30 transition duration-200"
+            className="px-4 py-2 bg-red-50 text-red-600 border border-red-200 dark:bg-red-500/20 dark:text-red-400 dark:border-red-500/30 rounded-xl font-bold text-xs sm:text-sm hover:bg-red-100 dark:hover:bg-red-500/30 transition duration-200"
           >
             Logout
           </button>
@@ -291,14 +306,14 @@ export default function AdminDashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
-        <div className="bg-[#2e1048]/95 backdrop-blur-md p-5 rounded-3xl shadow-2xl border border-purple-500/30">
-          <h3 className="text-sm font-bold text-white mb-3">Submissions Over Time</h3>
+        <div className="bg-white/95 dark:bg-[#2e1048]/95 backdrop-blur-md p-5 rounded-3xl shadow-2xl border border-blue-100 dark:border-purple-500/30">
+          <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3">Submissions Over Time</h3>
           <div className="relative h-56">
             <Line data={lineData} options={chartOptions} />
           </div>
         </div>
-        <div className="bg-[#2e1048]/95 backdrop-blur-md p-5 rounded-3xl shadow-2xl border border-purple-500/30">
-          <h3 className="text-sm font-bold text-white mb-3">Gender Distribution</h3>
+        <div className="bg-white/95 dark:bg-[#2e1048]/95 backdrop-blur-md p-5 rounded-3xl shadow-2xl border border-blue-100 dark:border-purple-500/30">
+          <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3">Gender Distribution</h3>
           <div className="relative h-56">
             <Pie data={pieData} options={pieOptions} />
           </div>

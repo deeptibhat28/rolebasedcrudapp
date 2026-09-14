@@ -4,10 +4,13 @@ import { getSubmissions, updateSubmission } from "../services/api";
 import { toast } from "react-toastify";
 import { logActivity } from "../utils/logger";
 import { isValidPhoneNumber } from "libphonenumber-js";
+import { useTheme } from "../context/ThemeContext";
+import ThemeToggle from "../components/ThemeToggle";
 
 export default function EditForm() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { theme } = useTheme();
   const currentUser =
     JSON.parse(
       localStorage.getItem("user") || localStorage.getItem("currentUser"),
@@ -252,14 +255,21 @@ export default function EditForm() {
 
   return (
     <div
-      className="min-h-screen w-full bg-[#240b3b] px-4 sm:px-6 py-6 md:py-10 relative overflow-hidden text-white font-sans"
-      style={{
-        backgroundImage:
-          "radial-gradient(circle at 20% 30%, rgba(105, 30, 150, 0.45) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(190, 40, 110, 0.35) 0%, transparent 50%), #240b3b",
-      }}
+      className="min-h-screen w-full bg-blue-50 dark:bg-[#240b3b] px-4 sm:px-6 py-6 md:py-10 relative overflow-hidden text-gray-900 dark:text-white font-sans transition-colors duration-200"
+      style={
+        theme === "dark"
+          ? {
+              backgroundImage:
+                "radial-gradient(circle at 20% 30%, rgba(105, 30, 150, 0.45) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(190, 40, 110, 0.35) 0%, transparent 50%), #240b3b",
+            }
+          : {
+              backgroundImage:
+                "radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.06) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(96, 165, 250, 0.06) 0%, transparent 50%)",
+            }
+      }
     >
-      <div className="absolute -top-32 -left-32 w-72 h-72 md:w-96 md:h-96 bg-purple-600/20 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute -bottom-32 -right-32 w-72 h-72 md:w-96 md:h-96 bg-pink-600/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute -top-32 -left-32 w-72 h-72 md:w-96 md:h-96 bg-blue-200/20 dark:bg-purple-600/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute -bottom-32 -right-32 w-72 h-72 md:w-96 md:h-96 bg-blue-300/20 dark:bg-pink-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
       <style>{`
         input:-webkit-autofill,
@@ -268,41 +278,52 @@ export default function EditForm() {
         input:-webkit-autofill:active,
         textarea:-webkit-autofill,
         select:-webkit-autofill {
+          -webkit-box-shadow: 0 0 0 1000px #eff6ff inset !important;
+          -webkit-text-fill-color: #111827 !important;
+          transition: background-color 5000s ease-in-out 0s !important;
+        }
+        .dark input:-webkit-autofill,
+        .dark input:-webkit-autofill:hover, 
+        .dark input:-webkit-autofill:focus, 
+        .dark input:-webkit-autofill:active,
+        .dark textarea:-webkit-autofill,
+        .dark select:-webkit-autofill {
           -webkit-box-shadow: 0 0 0 1000px #1b082d inset !important;
           -webkit-text-fill-color: white !important;
           transition: background-color 5000s ease-in-out 0s !important;
         }
       `}</style>
 
-      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#2e1048]/95 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-2xl mb-6 border border-purple-500/30 relative z-10 gap-4">
+      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white/95 dark:bg-[#2e1048]/95 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-2xl mb-6 border border-blue-200 dark:border-purple-500/30 relative z-10 gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-wide">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white tracking-wide">
             Edit Submission Form
           </h1>
-          <p className="text-xs sm:text-sm text-purple-300/80 mt-0.5">
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-purple-300/80 mt-0.5">
             Update user record details
           </p>
         </div>
-        <div>
+        <div className="flex items-center space-x-2 sm:space-x-3 w-full sm:w-auto justify-end">
+          <ThemeToggle />
           <button
             onClick={() => navigate("/user-dashboard")}
-            className="w-full sm:w-auto px-4 py-2.5 bg-[#1b082d]/70 text-purple-200 border border-purple-500/40 rounded-xl font-bold text-xs sm:text-sm hover:bg-[#1b082d] transition duration-200 shadow-md cursor-pointer text-center"
+            className="px-4 py-2.5 bg-blue-50 text-blue-700 border border-blue-200 dark:bg-[#1b082d]/70 dark:text-purple-200 dark:border-purple-500/40 rounded-xl font-bold text-xs sm:text-sm hover:bg-blue-100 hover:border-blue-300 dark:hover:bg-[#1b082d] transition duration-200 shadow-md cursor-pointer text-center"
           >
             ← Back to Dashboard
           </button>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto bg-[#2e1048]/95 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-2xl border border-purple-500/30 relative z-10">
+      <div className="max-w-7xl mx-auto bg-white/95 dark:bg-[#2e1048]/95 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-2xl border border-blue-100 dark:border-purple-500/30 relative z-10">
         <form
           onSubmit={handleSubmit}
           noValidate
           className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm"
         >
           {/* Full Name */}
-          <div className="md:col-span-2 bg-[#1b082d]/70 p-4 rounded-2xl border border-purple-500/40 shadow-inner">
-            <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-1">
-              Full Name <span className="text-red-400">*</span>
+          <div className="md:col-span-2 bg-blue-50 dark:bg-[#1b082d]/70 p-4 rounded-2xl border border-blue-200 dark:border-purple-500/40 shadow-inner">
+            <label className="block text-xs font-semibold text-blue-600/70 dark:text-purple-300/80 uppercase tracking-widest mb-1">
+              Full Name <span className="text-red-500 dark:text-red-400">*</span>
             </label>
             <input
               type="text"
@@ -312,14 +333,14 @@ export default function EditForm() {
               required
               autoComplete="new-password"
               placeholder="Enter full name"
-              className="w-full px-4 py-3 bg-[#240b3b] border border-purple-500/40 rounded-xl text-sm text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner"
+              className="w-full px-4 py-3 bg-white dark:bg-[#240b3b] border border-blue-200 dark:border-purple-500/40 rounded-xl text-sm text-gray-900 dark:text-white placeholder-blue-400/50 dark:placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner"
             />
           </div>
 
           {/* Email Address */}
-          <div className="bg-[#1b082d]/70 p-4 rounded-2xl border border-purple-500/40 shadow-inner">
-            <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-1">
-              Email Address <span className="text-red-400">*</span>
+          <div className="bg-blue-50 dark:bg-[#1b082d]/70 p-4 rounded-2xl border border-blue-200 dark:border-purple-500/40 shadow-inner">
+            <label className="block text-xs font-semibold text-blue-600/70 dark:text-purple-300/80 uppercase tracking-widest mb-1">
+              Email Address <span className="text-red-500 dark:text-red-400">*</span>
             </label>
             <input
               type="email"
@@ -329,14 +350,14 @@ export default function EditForm() {
               required
               autoComplete="new-password"
               placeholder="example123@gmail.com"
-              className="w-full px-4 py-3 bg-[#240b3b] border border-purple-500/40 rounded-xl text-sm text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner"
+              className="w-full px-4 py-3 bg-white dark:bg-[#240b3b] border border-blue-200 dark:border-purple-500/40 rounded-xl text-sm text-gray-900 dark:text-white placeholder-blue-400/50 dark:placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner"
             />
           </div>
 
           {/* Phone Number with Country Code Dropdown */}
-          <div className="bg-[#1b082d]/70 p-4 rounded-2xl border border-purple-500/40 shadow-inner">
-            <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-1">
-              Phone Number <span className="text-red-400">*</span>
+          <div className="bg-blue-50 dark:bg-[#1b082d]/70 p-4 rounded-2xl border border-blue-200 dark:border-purple-500/40 shadow-inner">
+            <label className="block text-xs font-semibold text-blue-600/70 dark:text-purple-300/80 uppercase tracking-widest mb-1">
+              Phone Number <span className="text-red-500 dark:text-red-400">*</span>
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <select
@@ -348,7 +369,7 @@ export default function EditForm() {
                     setFormData((prev) => ({ ...prev, customCountryCode: "" }));
                   }
                 }}
-                className="px-3 py-3 bg-[#240b3b] border border-purple-500/40 rounded-xl text-sm text-white focus:outline-none focus:border-orange-500 transition shadow-inner [&>option]:bg-[#240b3b] [&>option]:text-white"
+                className="px-3 py-3 bg-white dark:bg-[#240b3b] border border-blue-200 dark:border-purple-500/40 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 transition shadow-inner [&>option]:bg-white [&>option]:text-gray-900 dark:[&>option]:bg-[#240b3b] dark:[&>option]:text-white"
               >
                 <option value="+91">+91 (India)</option>
                 <option value="+1">+1 (USA/Canada)</option>
@@ -366,7 +387,7 @@ export default function EditForm() {
                   onChange={handleChange}
                   placeholder="+Code"
                   maxLength={5}
-                  className="px-3 py-3 bg-[#240b3b] border border-purple-500/40 rounded-xl text-sm text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner"
+                  className="px-3 py-3 bg-white dark:bg-[#240b3b] border border-blue-200 dark:border-purple-500/40 rounded-xl text-sm text-gray-900 dark:text-white placeholder-blue-400/50 dark:placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner"
                 />
               )}
 
@@ -378,15 +399,15 @@ export default function EditForm() {
                 required
                 autoComplete="new-password"
                 placeholder="Phone number"
-                className={`${formData.countryCode === "Other" ? "sm:col-span-1" : "sm:col-span-2"} w-full px-4 py-3 bg-[#240b3b] border border-purple-500/40 rounded-xl text-sm text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner`}
+                className={`${formData.countryCode === "Other" ? "sm:col-span-1" : "sm:col-span-2"} w-full px-4 py-3 bg-white dark:bg-[#240b3b] border border-blue-200 dark:border-purple-500/40 rounded-xl text-sm text-gray-900 dark:text-white placeholder-blue-400/50 dark:placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner`}
               />
             </div>
           </div>
 
           {/* Department */}
-          <div className="bg-[#1b082d]/70 p-4 rounded-2xl border border-purple-500/40 shadow-inner">
-            <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-1">
-              Department <span className="text-red-400">*</span>
+          <div className="bg-blue-50 dark:bg-[#1b082d]/70 p-4 rounded-2xl border border-blue-200 dark:border-purple-500/40 shadow-inner">
+            <label className="block text-xs font-semibold text-blue-600/70 dark:text-purple-300/80 uppercase tracking-widest mb-1">
+              Department <span className="text-red-500 dark:text-red-400">*</span>
             </label>
             <input
               type="text"
@@ -396,14 +417,14 @@ export default function EditForm() {
               required
               autoComplete="off"
               placeholder="Enter department"
-              className="w-full px-4 py-3 bg-[#240b3b] border border-purple-500/40 rounded-xl text-sm text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner"
+              className="w-full px-4 py-3 bg-white dark:bg-[#240b3b] border border-blue-200 dark:border-purple-500/40 rounded-xl text-sm text-gray-900 dark:text-white placeholder-blue-400/50 dark:placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner"
             />
           </div>
 
           {/* Designation */}
-          <div className="bg-[#1b082d]/70 p-4 rounded-2xl border border-purple-500/40 shadow-inner">
-            <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-1">
-              Designation <span className="text-red-400">*</span>
+          <div className="bg-blue-50 dark:bg-[#1b082d]/70 p-4 rounded-2xl border border-blue-200 dark:border-purple-500/40 shadow-inner">
+            <label className="block text-xs font-semibold text-blue-600/70 dark:text-purple-300/80 uppercase tracking-widest mb-1">
+              Designation <span className="text-red-500 dark:text-red-400">*</span>
             </label>
             <input
               type="text"
@@ -413,16 +434,16 @@ export default function EditForm() {
               required
               autoComplete="off"
               placeholder="Enter designation"
-              className="w-full px-4 py-3 bg-[#240b3b] border border-purple-500/40 rounded-xl text-sm text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner"
+              className="w-full px-4 py-3 bg-white dark:bg-[#240b3b] border border-blue-200 dark:border-purple-500/40 rounded-xl text-sm text-gray-900 dark:text-white placeholder-blue-400/50 dark:placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner"
             />
           </div>
 
           {/* Gender */}
-          <div className="bg-[#1b082d]/70 p-4 rounded-2xl border border-purple-500/40 shadow-inner">
-            <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-2">
-              Gender <span className="text-red-400">*</span>
+          <div className="bg-blue-50 dark:bg-[#1b082d]/70 p-4 rounded-2xl border border-blue-200 dark:border-purple-500/40 shadow-inner">
+            <label className="block text-xs font-semibold text-blue-600/70 dark:text-purple-300/80 uppercase tracking-widest mb-2">
+              Gender <span className="text-red-500 dark:text-red-400">*</span>
             </label>
-            <div className="flex flex-wrap items-center gap-4 sm:space-x-6 text-purple-100 text-sm pt-2">
+            <div className="flex flex-wrap items-center gap-4 sm:space-x-6 text-gray-700 dark:text-purple-100 text-sm pt-2">
               {["Male", "Female", "Other"].map((option) => (
                 <label
                   key={option}
@@ -435,7 +456,7 @@ export default function EditForm() {
                     checked={formData.gender === option}
                     onChange={handleChange}
                     required
-                    className="text-orange-500 focus:ring-orange-500 bg-[#240b3b] border-purple-500/40"
+                    className="text-orange-500 focus:ring-orange-500 bg-white dark:bg-[#240b3b] border-blue-300 dark:border-purple-500/40"
                   />
                   <span>{option}</span>
                 </label>
@@ -444,9 +465,9 @@ export default function EditForm() {
           </div>
 
           {/* Highest Education */}
-          <div className="bg-[#1b082d]/70 p-4 rounded-2xl border border-purple-500/40 shadow-inner">
-            <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-1">
-              Highest Education <span className="text-red-400">*</span>
+          <div className="bg-blue-50 dark:bg-[#1b082d]/70 p-4 rounded-2xl border border-blue-200 dark:border-purple-500/40 shadow-inner">
+            <label className="block text-xs font-semibold text-blue-600/70 dark:text-purple-300/80 uppercase tracking-widest mb-1">
+              Highest Education <span className="text-red-500 dark:text-red-400">*</span>
             </label>
             <select
               name="education"
@@ -458,7 +479,7 @@ export default function EditForm() {
                 }
               }}
               required
-              className="w-full px-4 py-3 bg-[#240b3b] border border-purple-500/40 rounded-xl text-sm text-white focus:outline-none focus:border-orange-500 transition shadow-inner [&>option]:bg-[#240b3b] [&>option]:text-white"
+              className="w-full px-4 py-3 bg-white dark:bg-[#240b3b] border border-blue-200 dark:border-purple-500/40 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 transition shadow-inner [&>option]:bg-white [&>option]:text-gray-900 dark:[&>option]:bg-[#240b3b] dark:[&>option]:text-white"
             >
               <option value="" disabled>
                 Select Education
@@ -474,9 +495,9 @@ export default function EditForm() {
 
           {/* Custom Education (if Other) */}
           {formData.education === "Other" && (
-            <div className="md:col-span-2 bg-[#1b082d]/70 p-4 rounded-2xl border border-purple-500/40 shadow-inner">
-              <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-1">
-                Custom Education <span className="text-red-400">*</span>
+            <div className="md:col-span-2 bg-blue-50 dark:bg-[#1b082d]/70 p-4 rounded-2xl border border-blue-200 dark:border-purple-500/40 shadow-inner">
+              <label className="block text-xs font-semibold text-blue-600/70 dark:text-purple-300/80 uppercase tracking-widest mb-1">
+                Custom Education <span className="text-red-500 dark:text-red-400">*</span>
               </label>
               <input
                 type="text"
@@ -486,14 +507,14 @@ export default function EditForm() {
                 placeholder="Please specify education"
                 required
                 autoComplete="off"
-                className="w-full px-4 py-3 bg-[#240b3b] border border-purple-500/40 rounded-xl text-sm text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner"
+                className="w-full px-4 py-3 bg-white dark:bg-[#240b3b] border border-blue-200 dark:border-purple-500/40 rounded-xl text-sm text-gray-900 dark:text-white placeholder-blue-400/50 dark:placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner"
               />
             </div>
           )}
 
           {/* Skills */}
-          <div className="md:col-span-2 bg-[#1b082d]/70 p-4 rounded-2xl border border-purple-500/40 shadow-inner">
-            <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-2">
+          <div className="md:col-span-2 bg-blue-50 dark:bg-[#1b082d]/70 p-4 rounded-2xl border border-blue-200 dark:border-purple-500/40 shadow-inner">
+            <label className="block text-xs font-semibold text-blue-600/70 dark:text-purple-300/80 uppercase tracking-widest mb-2">
               Skills & Technologies
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -513,7 +534,7 @@ export default function EditForm() {
                 return (
                   <label
                     key={skill}
-                    className="flex items-center space-x-2 text-sm text-purple-100 cursor-pointer select-none bg-[#240b3b]/60 p-3 rounded-xl border border-purple-500/30 hover:border-purple-500/60 transition"
+                    className="flex items-center space-x-2 text-sm text-gray-700 dark:text-purple-100 cursor-pointer select-none bg-blue-50/60 dark:bg-[#240b3b]/60 p-3 rounded-xl border border-blue-200 dark:border-purple-500/30 hover:border-blue-300 dark:hover:border-purple-500/60 transition"
                   >
                     <input
                       type="checkbox"
@@ -533,7 +554,7 @@ export default function EditForm() {
                           skills: updatedSkills,
                         }));
                       }}
-                      className="rounded bg-[#240b3b] border-purple-500/40 text-orange-500 focus:ring-orange-500 w-4 h-4"
+                      className="rounded bg-white dark:bg-[#240b3b] border-blue-300 dark:border-purple-500/40 text-orange-500 focus:ring-orange-500 w-4 h-4"
                     />
                     <span>{skill}</span>
                   </label>
@@ -543,9 +564,9 @@ export default function EditForm() {
           </div>
 
           {/* Address */}
-          <div className="md:col-span-2 bg-[#1b082d]/70 p-4 rounded-2xl border border-purple-500/40 shadow-inner">
-            <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-1">
-              Address <span className="text-red-400">*</span>
+          <div className="md:col-span-2 bg-blue-50 dark:bg-[#1b082d]/70 p-4 rounded-2xl border border-blue-200 dark:border-purple-500/40 shadow-inner">
+            <label className="block text-xs font-semibold text-blue-600/70 dark:text-purple-300/80 uppercase tracking-widest mb-1">
+              Address <span className="text-red-500 dark:text-red-400">*</span>
             </label>
             <textarea
               name="address"
@@ -555,13 +576,13 @@ export default function EditForm() {
               required
               autoComplete="off"
               placeholder="Enter address..."
-              className="w-full px-4 py-3 bg-[#240b3b] border border-purple-500/40 rounded-xl text-sm text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner resize-none"
+              className="w-full px-4 py-3 bg-white dark:bg-[#240b3b] border border-blue-200 dark:border-purple-500/40 rounded-xl text-sm text-gray-900 dark:text-white placeholder-blue-400/50 dark:placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner resize-none"
             />
           </div>
 
           {/* Description */}
-          <div className="md:col-span-2 bg-[#1b082d]/70 p-4 rounded-2xl border border-purple-500/40 shadow-inner">
-            <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-1">
+          <div className="md:col-span-2 bg-blue-50 dark:bg-[#1b082d]/70 p-4 rounded-2xl border border-blue-200 dark:border-purple-500/40 shadow-inner">
+            <label className="block text-xs font-semibold text-blue-600/70 dark:text-purple-300/80 uppercase tracking-widest mb-1">
               Description
             </label>
             <textarea
@@ -571,21 +592,21 @@ export default function EditForm() {
               rows="2"
               autoComplete="off"
               placeholder="Enter description..."
-              className="w-full px-4 py-3 bg-[#240b3b] border border-purple-500/40 rounded-xl text-sm text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner resize-none"
+              className="w-full px-4 py-3 bg-white dark:bg-[#240b3b] border border-blue-200 dark:border-purple-500/40 rounded-xl text-sm text-gray-900 dark:text-white placeholder-blue-400/50 dark:placeholder-purple-400/40 focus:outline-none focus:border-orange-500 transition shadow-inner resize-none"
             />
           </div>
 
           {/* Date of Submission */}
-          <div className="md:col-span-2 bg-[#1b082d]/70 p-4 rounded-2xl border border-purple-500/40 shadow-inner">
-            <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-1">
-              Date of Submission <span className="text-red-400">*</span>
+          <div className="md:col-span-2 bg-blue-50 dark:bg-[#1b082d]/70 p-4 rounded-2xl border border-blue-200 dark:border-purple-500/40 shadow-inner">
+            <label className="block text-xs font-semibold text-blue-600/70 dark:text-purple-300/80 uppercase tracking-widest mb-1">
+              Date of Submission <span className="text-red-500 dark:text-red-400">*</span>
             </label>
             <input
               type="date"
               name="dateOfSubmission"
               value={formData.dateOfSubmission}
               readOnly
-              className="w-full px-4 py-3 bg-[#240b3b]/60 border border-purple-500/30 rounded-xl text-sm text-purple-300/60 cursor-not-allowed focus:outline-none shadow-inner"
+              className="w-full px-4 py-3 bg-blue-100/60 dark:bg-[#240b3b]/60 border border-blue-200 dark:border-purple-500/30 rounded-xl text-sm text-blue-400/70 dark:text-purple-300/60 cursor-not-allowed focus:outline-none shadow-inner"
             />
           </div>
 

@@ -5,6 +5,8 @@ import { toast } from "react-toastify";
 import * as OTPAuth from "otpauth";
 import QRCode from "qrcode";
 import { logActivity } from "../utils/logger";
+import { useTheme } from "../context/ThemeContext";
+import ThemeToggle from "../components/ThemeToggle";
 
 export default function Register() {
   const [username, setUsername] = useState("");
@@ -13,6 +15,7 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState("");
+  const { theme } = useTheme();
 
   const navigate = useNavigate();
 
@@ -80,20 +83,27 @@ export default function Register() {
   if (isRegistered) {
     return (
       <div 
-        className="min-h-screen w-full flex items-center justify-center bg-[#150624] px-4 py-8 relative overflow-hidden"
-        style={{ backgroundImage: "radial-gradient(circle at 20% 30%, rgba(105, 30, 150, 0.45) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(190, 40, 110, 0.35) 0%, transparent 50%), #150624" }}
+        className="min-h-screen w-full flex items-center justify-center bg-blue-50 dark:bg-[#150624] px-4 py-8 relative overflow-hidden transition-colors duration-200"
+        style={
+          theme === "dark"
+            ? { backgroundImage: "radial-gradient(circle at 20% 30%, rgba(105, 30, 150, 0.45) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(190, 40, 110, 0.35) 0%, transparent 50%), #150624" }
+            : { backgroundImage: "radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.06) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(96, 165, 250, 0.06) 0%, transparent 50%)" }
+        }
       >
-        <div className="relative w-full max-w-md bg-[#240b3b] backdrop-blur-md rounded-3xl shadow-2xl p-8 border border-purple-500/30 text-center z-10">
-          <h2 className="text-2xl font-bold text-white mb-2 tracking-wide">
+        <div className="absolute top-4 right-4 z-20">
+          <ThemeToggle />
+        </div>
+        <div className="relative w-full max-w-md bg-white dark:bg-[#240b3b] backdrop-blur-md rounded-3xl shadow-2xl p-8 border border-blue-200 dark:border-purple-500/30 text-center z-10">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 tracking-wide">
             Set Up Authenticator
           </h2>
-          <p className="text-xs text-purple-200/80 mb-6 font-medium leading-relaxed">
-            Scan this QR code <b className="text-orange-400">only once</b> using Google Authenticator on
+          <p className="text-xs text-gray-500 dark:text-purple-200/80 mb-6 font-medium leading-relaxed">
+            Scan this QR code <b className="text-orange-500 dark:text-orange-400">only once</b> using Google Authenticator on
             your phone. You won't need to scan it again when logging in!
           </p>
 
           {qrCodeUrl && (
-            <div className="flex justify-center mb-6 bg-white p-4 rounded-2xl shadow-inner">
+            <div className="flex justify-center mb-6 bg-white p-4 rounded-2xl shadow-inner border border-blue-100 dark:border-transparent">
               <img src={qrCodeUrl} alt="2FA QR Code" className="w-44 h-44" />
             </div>
           )}
@@ -111,34 +121,42 @@ export default function Register() {
 
   return (
     <div 
-      className="min-h-screen w-full flex items-center justify-center bg-[#240b3b] font-sans relative overflow-hidden m-0 p-6 md:p-12"
-      style={{ backgroundImage: "radial-gradient(circle at 20% 30%, rgba(105, 30, 150, 0.45) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(190, 40, 110, 0.35) 0%, transparent 50%), #240b3b" }}
+      className="min-h-screen w-full flex items-center justify-center bg-blue-50 dark:bg-[#240b3b] font-sans relative overflow-hidden m-0 p-6 md:p-12 transition-colors duration-200"
+      style={
+        theme === "dark"
+          ? { backgroundImage: "radial-gradient(circle at 20% 30%, rgba(105, 30, 150, 0.45) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(190, 40, 110, 0.35) 0%, transparent 50%), #240b3b" }
+          : { backgroundImage: "radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.06) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(96, 165, 250, 0.06) 0%, transparent 50%)" }
+      }
     >
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20">
+        <ThemeToggle />
+      </div>
+
       <div className="w-full max-w-6xl mx-auto flex items-center justify-center lg:justify-between relative z-10">
         
-        <div className="hidden lg:flex flex-col justify-center text-white max-w-xl pr-8">
+        <div className="hidden lg:flex flex-col justify-center text-gray-900 dark:text-white max-w-xl pr-8">
           <div className="flex space-x-1.5 mb-6">
-            <div className="w-4 h-4 bg-white rounded-sm"></div>
-            <div className="w-4 h-4 bg-white/60 rounded-sm"></div>
+            <div className="w-4 h-4 bg-blue-600 dark:bg-white rounded-sm"></div>
+            <div className="w-4 h-4 bg-blue-600/60 dark:bg-white/60 rounded-sm"></div>
           </div>
 
-          <h1 className="text-6xl lg:text-7xl font-extrabold tracking-tight mb-4 text-white">
+          <h1 className="text-6xl lg:text-7xl font-extrabold tracking-tight mb-4 text-gray-900 dark:text-white">
             Join Us!
           </h1>
           <div className="w-20 h-1.5 bg-orange-500 rounded-full mb-6"></div>
-          <p className="text-purple-200/90 text-lg lg:text-xl leading-relaxed">
+          <p className="text-gray-600 dark:text-purple-200/90 text-lg lg:text-xl leading-relaxed">
             Create your account to access role-based administration tools, securely manage workflows, and collaborate seamlessly.
           </p>
         </div>
 
-        <div className="w-full sm:w-105 lg:w-115 bg-[#2e1048]/95 backdrop-blur-md p-8 md:p-10 rounded-3xl border border-purple-500/30 shadow-2xl">
-          <h2 className="text-2xl font-bold text-white text-center mb-8 tracking-wide">
+        <div className="w-full sm:w-105 lg:w-115 bg-white/95 dark:bg-[#2e1048]/95 backdrop-blur-md p-8 md:p-10 rounded-3xl border border-blue-200 dark:border-purple-500/30 shadow-2xl">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8 tracking-wide">
             CREATE ACCOUNT
           </h2>
 
           <form onSubmit={handleRegister} className="space-y-5">
             <div>
-              <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-2">
+              <label className="block text-xs font-semibold text-blue-600/70 dark:text-purple-300/80 uppercase tracking-widest mb-2">
                 Username
               </label>
               <input
@@ -147,12 +165,12 @@ export default function Register() {
                 onChange={(e) => setUsername(e.target.value)}
                 required
                 placeholder="Username"
-                className="w-full px-5 py-3.5 rounded-full bg-[#1b082d] border border-purple-500/40 text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 text-sm transition shadow-inner"
+                className="w-full px-5 py-3.5 rounded-full bg-blue-50 dark:bg-[#1b082d] border border-blue-200 dark:border-purple-500/40 text-gray-900 dark:text-white placeholder-blue-400/50 dark:placeholder-purple-400/40 focus:outline-none focus:border-orange-500 text-sm transition shadow-inner"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-2">
+              <label className="block text-xs font-semibold text-blue-600/70 dark:text-purple-300/80 uppercase tracking-widest mb-2">
                 Password
               </label>
               <div className="relative">
@@ -162,12 +180,12 @@ export default function Register() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   placeholder="••••••••••••"
-                  className="w-full px-5 py-3.5 pr-12 rounded-full bg-[#1b082d] border border-purple-500/40 text-white placeholder-purple-400/40 focus:outline-none focus:border-orange-500 text-sm transition shadow-inner"
+                  className="w-full px-5 py-3.5 pr-12 rounded-full bg-blue-50 dark:bg-[#1b082d] border border-blue-200 dark:border-purple-500/40 text-gray-900 dark:text-white placeholder-blue-400/50 dark:placeholder-purple-400/40 focus:outline-none focus:border-orange-500 text-sm transition shadow-inner"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-purple-400 hover:text-white transition-colors"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-blue-400 dark:text-purple-400 hover:text-gray-900 dark:hover:text-white transition-colors"
                 >
                   {showPassword ? (
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -184,13 +202,13 @@ export default function Register() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-purple-300/80 uppercase tracking-widest mb-2">
+              <label className="block text-xs font-semibold text-blue-600/70 dark:text-purple-300/80 uppercase tracking-widest mb-2">
                 Account Role
               </label>
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="w-full px-5 py-3.5 rounded-full bg-[#1b082d] border border-purple-500/40 text-white focus:outline-none focus:border-orange-500 text-sm cursor-pointer shadow-inner [&>option]:bg-[#240b3b] [&>option]:text-white"
+                className="w-full px-5 py-3.5 rounded-full bg-blue-50 dark:bg-[#1b082d] border border-blue-200 dark:border-purple-500/40 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 text-sm cursor-pointer shadow-inner [&>option]:bg-white [&>option]:text-gray-900 dark:[&>option]:bg-[#240b3b] dark:[&>option]:text-white"
               >
                 <option value="user">Normal User</option>
                 <option value="admin">Admin</option>
@@ -206,9 +224,9 @@ export default function Register() {
           </form>
 
           <div className="text-center mt-6">
-            <p className="text-xs text-purple-300/70">
+            <p className="text-xs text-gray-500 dark:text-purple-300/70">
               Already have an account?{" "}
-              <Link to="/" className="text-orange-400 font-bold hover:underline">
+              <Link to="/" className="text-orange-500 dark:text-orange-400 font-bold hover:underline">
                 Sign In
               </Link>
             </p>
