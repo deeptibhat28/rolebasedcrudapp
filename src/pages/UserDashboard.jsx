@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { logActivity } from "../utils/logger";
 import { useTheme } from "../context/ThemeContext";
 import ThemeToggle from "../components/ThemeToggle";
+import { startUserTour } from "../utils/userTour";
 
 export default function UserDashboard() {
   const navigate = useNavigate();
@@ -28,6 +29,20 @@ export default function UserDashboard() {
       fetchUserSubmissions();
     }
   }, []);
+
+  // Auto-start tour on first visit
+  useEffect(() => {
+    if (!currentUser) return;
+    const seenKey = `hasSeenUserTour_${currentUser.username}`;
+    const hasSeenTour = localStorage.getItem(seenKey);
+    if (!hasSeenTour) {
+      const timer = setTimeout(() => {
+        startUserTour(submissions.length > 0, currentUser?.username);
+        localStorage.setItem(seenKey, "true");
+      }, 600); // small delay so layout/table has settled
+      return () => clearTimeout(timer);
+    }
+  }, [submissions]);
 
   const fetchUserSubmissions = async () => {
     try {
@@ -109,7 +124,7 @@ export default function UserDashboard() {
         }`}
       >
         
-        <div className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white/95 dark:bg-[#2e1048]/95 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-2xl border border-blue-200 dark:border-purple-500/30 z-10 relative gap-4">
+        <div id="dashboard-header" className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white/95 dark:bg-[#2e1048]/95 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-2xl border border-blue-200 dark:border-purple-500/30 z-10 relative gap-4">
           <div>
             <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white tracking-wide">
               User Dashboard
@@ -122,14 +137,25 @@ export default function UserDashboard() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-            <ThemeToggle />
             <button
+              onClick={() => startUserTour(submissions.length > 0, currentUser?.username)}
+              title="Take a tour"
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-blue-50 text-blue-700 border border-blue-200 dark:bg-purple-500/15 dark:text-purple-200 dark:border-purple-500/40 hover:bg-blue-100 dark:hover:bg-purple-500/25 transition font-bold text-sm cursor-pointer"
+            >
+              ?
+            </button>
+            <div data-tour="theme-toggle">
+              <ThemeToggle />
+            </div>
+            <button
+              data-tour="create-form-btn"
               onClick={() => navigate("/create-form")}
               className="flex-1 sm:flex-initial px-4 sm:px-5 py-2.5 bg-linear-to-r from-orange-500 to-pink-600 hover:opacity-95 text-white rounded-xl font-bold text-xs sm:text-sm transition duration-200 shadow-lg tracking-wider text-center cursor-pointer"
             >
               Create New Form
             </button>
             <button
+              data-tour="logout-btn"
               onClick={handleLogout}
               className="flex-1 sm:flex-initial px-4 sm:px-5 py-2.5 bg-red-50 text-red-600 border border-red-200 dark:bg-red-500/15 dark:text-red-400 dark:border-red-500/30 rounded-xl font-bold text-xs sm:text-sm hover:bg-red-100 dark:hover:bg-red-500/25 transition duration-200 text-center cursor-pointer"
             >
@@ -138,7 +164,10 @@ export default function UserDashboard() {
           </div>
         </div>
 
-        <div className="w-full bg-white/95 dark:bg-[#2e1048]/95 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-2xl border border-blue-100 dark:border-purple-500/30 z-10 relative">
+        <div
+          data-tour="submissions-section"
+          className="w-full bg-white/95 dark:bg-[#2e1048]/95 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-2xl border border-blue-100 dark:border-purple-500/30 z-10 relative"
+        >
           <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-4 tracking-wide">
             My Submissions
           </h2>
@@ -166,7 +195,7 @@ export default function UserDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-blue-100 dark:divide-purple-500/20 text-xs sm:text-sm text-gray-700 dark:text-purple-100">
-                  {submissions.map((sub) => (
+                  {submissions.map((sub, index) => (
                     <tr key={sub.id} className="hover:bg-blue-50/60 dark:hover:bg-purple-900/30 transition">
                       <td className="py-3.5 px-3 font-bold text-gray-900 dark:text-white">
                         {sub.fullName}
@@ -186,24 +215,29 @@ export default function UserDashboard() {
                           : "N/A"}
                       </td>
                       <td className="py-3.5 px-3 text-right space-x-1.5 sm:space-x-2 whitespace-nowrap">
-                        <button
-                          onClick={() => handleViewClick(sub)}
-                          className="px-2.5 sm:px-3 py-1.5 bg-sky-50 text-sky-700 border border-sky-200 dark:bg-sky-500/20 dark:text-sky-300 dark:border-sky-500/40 rounded-xl text-xs font-bold hover:bg-sky-100 dark:hover:bg-sky-500/30 transition cursor-pointer"
+                        <div
+                          className="inline-flex items-center gap-1.5 sm:gap-2"
+                          {...(index === 0 ? { "data-tour": "row-actions" } : {})}
                         >
-                          View
-                        </button>
-                        <button
-                          onClick={() => navigate(`/edit-form/${sub.id}`)}
-                          className="px-2.5 sm:px-3 py-1.5 bg-blue-50 text-blue-700 border border-blue-200 dark:bg-purple-500/20 dark:text-purple-200 dark:border-purple-500/40 rounded-xl text-xs font-bold hover:bg-blue-100 dark:hover:bg-purple-500/35 transition cursor-pointer"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDeleteClick(sub.id)}
-                          className="px-2.5 sm:px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 dark:bg-red-500/20 dark:text-red-300 dark:border-red-500/40 rounded-xl text-xs font-bold hover:bg-red-100 dark:hover:bg-red-500/30 transition cursor-pointer"
-                        >
-                          Delete
-                        </button>
+                          <button
+                            onClick={() => handleViewClick(sub)}
+                            className="px-2.5 sm:px-3 py-1.5 bg-sky-50 text-sky-700 border border-sky-200 dark:bg-sky-500/20 dark:text-sky-300 dark:border-sky-500/40 rounded-xl text-xs font-bold hover:bg-sky-100 dark:hover:bg-sky-500/30 transition cursor-pointer"
+                          >
+                            View
+                          </button>
+                          <button
+                            onClick={() => navigate(`/edit-form/${sub.id}`)}
+                            className="px-2.5 sm:px-3 py-1.5 bg-blue-50 text-blue-700 border border-blue-200 dark:bg-purple-500/20 dark:text-purple-200 dark:border-purple-500/40 rounded-xl text-xs font-bold hover:bg-blue-100 dark:hover:bg-purple-500/35 transition cursor-pointer"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClick(sub.id)}
+                            className="px-2.5 sm:px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 dark:bg-red-500/20 dark:text-red-300 dark:border-red-500/40 rounded-xl text-xs font-bold hover:bg-red-100 dark:hover:bg-red-500/30 transition cursor-pointer"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}

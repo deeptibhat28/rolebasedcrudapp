@@ -15,12 +15,14 @@ import {
 } from "chart.js";
 import { useTheme } from "../context/ThemeContext";
 import ThemeToggle from "../components/ThemeToggle";
+import { startAdminTour } from "../utils/adminTour";
 
 ChartJS.register(LineElement, PointElement, ArcElement, CategoryScale, LinearScale, Tooltip, Legend);
 
-function StatCard({ label, value, onClick }) {
+function StatCard({ label, value, onClick, tourId }) {
   return (
     <div
+      data-tour={tourId}
       onClick={onClick}
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}
@@ -87,7 +89,7 @@ function UsersModal({ users, onClose }) {
               {visibleUsers.map((u) => (
                 <div
                   key={u.id}
-                  className="flex items-center justify-between bg-blue-50/60 hover:bg-blue-50 dark:bg-[#1b082d]/70 border border-blue-100 dark:border-purple-500/20 rounded-xl px-4 py-2.5 transition duration-150"
+                  className="flex items-center justify-between bg-blue-50/60  dark:bg-[#1b082d]/70 border border-blue-100 dark:border-purple-500/20 rounded-xl px-4 py-2.5 "
                 >
                   <span className="text-gray-900 dark:text-white font-semibold text-sm">{u.username}</span>
                   {u.email && (
@@ -178,6 +180,22 @@ export default function AdminDashboard() {
     }
   }, []);
 
+  // Auto-start tour on first visit
+  useEffect(() => {
+    if (!currentUser || currentUser.role !== "admin") return;
+    const seenKey = `hasSeenAdminTour_${currentUser.username}`;
+    const hasSeenTour = localStorage.getItem(seenKey);
+    if (!hasSeenTour && (submissions.length > 0 || users.length > 0)) {
+      const timer = setTimeout(() => {
+        requestAnimationFrame(() => {
+          startAdminTour(currentUser?.username);
+          localStorage.setItem(seenKey, "true");
+        });
+      }, 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [submissions, users]);
+
   const fetchDashboardData = async () => {
     try {
       const [subsData, usersData] = await Promise.all([
@@ -253,7 +271,10 @@ export default function AdminDashboard() {
       <div className="absolute -top-32 -left-32 w-96 h-96 bg-blue-200/20 dark:bg-purple-600/20 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-blue-300/20 dark:bg-pink-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center  bg-white/95  dark:bg-[#2e1048]/95 backdrop-blur-md p-5 sm:p-6 rounded-3xl shadow-2xl mb-6  dark:border-purple-500/30 relative z-10 gap-4">
+      <div
+        id="admin-dashboard-header"
+        className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center  bg-white/95  dark:bg-[#2e1048]/95 backdrop-blur-md p-5 sm:p-6 rounded-3xl shadow-2xl mb-6  dark:border-purple-500/30 relative z-10 gap-4"
+      >
         <div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white tracking-wide">
             Admin Control Panel
@@ -265,20 +286,32 @@ export default function AdminDashboard() {
         </div>
 
         <div className="space-x-2 sm:space-x-3 flex items-center w-full sm:w-auto justify-end">
-          <ThemeToggle />
           <button
+            onClick={() => startAdminTour(currentUser?.username)}
+            title="Take a tour"
+            className="w-9 h-9 flex items-center justify-center rounded-full bg-blue-50 text-blue-700 border border-blue-200 dark:bg-purple-500/15 dark:text-purple-200 dark:border-purple-500/40 hover:bg-blue-100 dark:hover:bg-purple-500/25 transition font-bold text-sm cursor-pointer"
+          >
+            ?
+          </button>
+          <div data-tour="theme-toggle-admin">
+            <ThemeToggle />
+          </div>
+          <button
+            data-tour="all-submissions-btn"
             onClick={() => navigate("/admin-submissions")}
             className="px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 dark:bg-[#1b082d]/70 dark:text-purple-200 dark:border-purple-500/40 rounded-xl font-bold text-xs sm:text-sm hover:bg-blue-100 hover:border-blue-300 dark:hover:bg-[#1b082d] transition duration-200 shadow-md"
           >
             All Submissions
           </button>
           <button
+            data-tour="activity-logs-btn"
             onClick={() => navigate("/activity-logs")}
             className="px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 dark:bg-[#1b082d]/70 dark:text-purple-200 dark:border-purple-500/40 rounded-xl font-bold text-xs sm:text-sm hover:bg-blue-100 hover:border-blue-300 dark:hover:bg-[#1b082d] transition duration-200 shadow-md"
           >
             Activity Logs
           </button>
           <button
+            data-tour="admin-logout-btn"
             onClick={handleLogout}
             className="px-4 py-2 bg-red-50 text-red-600 border border-red-200 dark:bg-red-500/20 dark:text-red-400 dark:border-red-500/30 rounded-xl font-bold text-xs sm:text-sm hover:bg-red-100 dark:hover:bg-red-500/30 transition duration-200"
           >
@@ -289,16 +322,19 @@ export default function AdminDashboard() {
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 relative z-10">
         <StatCard
+          tourId="stat-total-users"
           label="Total Users"
           value={totalUsers}
           onClick={() => setShowUsersModal(true)}
         />
         <StatCard
+          tourId="stat-total-submissions"
           label="Total Submissions"
           value={totalSubmissions}
           onClick={() => navigate("/admin-submissions")}
         />
         <StatCard
+          tourId="stat-submissions-today"
           label="Submissions Today"
           value={submissionsToday}
           onClick={() => navigate("/admin-submissions?date=today")}
@@ -306,13 +342,13 @@ export default function AdminDashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
-        <div className="bg-white/95 dark:bg-[#2e1048]/95 backdrop-blur-md p-5 rounded-3xl shadow-2xl border border-blue-100 dark:border-purple-500/30">
+        <div data-tour="chart-submissions-over-time" className="bg-white/95 dark:bg-[#2e1048]/95 backdrop-blur-md p-5 rounded-3xl shadow-2xl border border-blue-100 dark:border-purple-500/30">
           <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3">Submissions Over Time</h3>
           <div className="relative h-56">
             <Line data={lineData} options={chartOptions} />
           </div>
         </div>
-        <div className="bg-white/95 dark:bg-[#2e1048]/95 backdrop-blur-md p-5 rounded-3xl shadow-2xl border border-blue-100 dark:border-purple-500/30">
+        <div data-tour="chart-gender-distribution" className="bg-white/95 dark:bg-[#2e1048]/95 backdrop-blur-md p-5 rounded-3xl shadow-2xl border border-blue-100 dark:border-purple-500/30">
           <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3">Gender Distribution</h3>
           <div className="relative h-56">
             <Pie data={pieData} options={pieOptions} />
