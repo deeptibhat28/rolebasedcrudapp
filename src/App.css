@@ -334,3 +334,11 @@
 .dark .driver-popover-arrow-side-top.driver-popover-arrow { border-top-color: #341054 !important; }
 .dark .driver-popover-arrow-side-left.driver-popover-arrow { border-left-color: #341054 !important; }
 .dark .driver-popover-arrow-side-right.driver-popover-arrow { border-right-color: #341054 !important; }
+
+.recharts-wrapper svg:focus,
+.recharts-wrapper *:focus,
+.recharts-surface,
+.recharts-sector,
+.recharts-rectangle {
+  outline: none !important;
+}

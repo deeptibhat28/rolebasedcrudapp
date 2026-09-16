@@ -17,7 +17,15 @@ import { useTheme } from "../context/ThemeContext";
 import ThemeToggle from "../components/ThemeToggle";
 import { startAdminTour } from "../utils/adminTour";
 
-ChartJS.register(LineElement, PointElement, ArcElement, CategoryScale, LinearScale, Tooltip, Legend);
+ChartJS.register(
+  LineElement,
+  PointElement,
+  ArcElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+);
 
 function StatCard({ label, value, onClick, tourId }) {
   return (
@@ -32,14 +40,18 @@ function StatCard({ label, value, onClick, tourId }) {
           onClick();
         }
       }}
-       className={`bg-white border border-blue-100 dark:bg-purple-900/60 dark:border-purple-500/30 rounded-2xl p-4 shadow-lg transition duration-200 group ${
+      className={`bg-white border border-blue-100 dark:bg-purple-900/60 dark:border-purple-500/30 rounded-2xl p-4 shadow-lg transition duration-200 group ${
         onClick
           ? "cursor-pointer hover:bg-blue-500 hover:border-blue-500 hover:-translate-y-0.5 dark:hover:border-purple-400/60 dark:hover:bg-purple-900/80"
           : ""
       }`}
     >
-      <p className="text-[11px] text-blue-600/70 group-hover:text-white dark:text-purple-300/80 uppercase tracking-wide font-bold transition duration-200">{label}</p>
-      <p className="text-2xl font-extrabold text-gray-900 group-hover:text-white dark:text-white mt-1.5 transition duration-200">{value}</p>
+      <p className="text-[11px] text-blue-600/70 group-hover:text-white dark:text-purple-300/80 uppercase tracking-wide font-bold transition duration-200">
+        {label}
+      </p>
+      <p className="text-2xl font-extrabold text-gray-900 group-hover:text-white dark:text-white mt-1.5 transition duration-200">
+        {value}
+      </p>
     </div>
   );
 }
@@ -68,7 +80,9 @@ function UsersModal({ users, onClose }) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between p-5 border-b border-blue-100 dark:border-purple-500/30">
-          <h3 className="text-lg font-extrabold text-gray-900 dark:text-white">Total Users ({users.length})</h3>
+          <h3 className="text-lg font-extrabold text-gray-900 dark:text-white">
+            Total Users ({users.length})
+          </h3>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-blue-600 dark:text-purple-300 dark:hover:text-white text-xl leading-none px-2"
@@ -83,7 +97,9 @@ function UsersModal({ users, onClose }) {
           className="overflow-y-auto p-5 space-y-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-blue-50 dark:[&::-webkit-scrollbar-track]:bg-[#2e1048] [&::-webkit-scrollbar-thumb]:bg-blue-200 dark:[&::-webkit-scrollbar-thumb]:bg-purple-900/60 [&::-webkit-scrollbar-thumb]:rounded-full"
         >
           {users.length === 0 ? (
-            <p className="text-gray-500 dark:text-purple-300/70 text-sm">No users found.</p>
+            <p className="text-gray-500 dark:text-purple-300/70 text-sm">
+              No users found.
+            </p>
           ) : (
             <>
               {visibleUsers.map((u) => (
@@ -91,9 +107,13 @@ function UsersModal({ users, onClose }) {
                   key={u.id}
                   className="flex items-center justify-between bg-blue-50/60  dark:bg-[#1b082d]/70 border border-blue-100 dark:border-purple-500/20 rounded-xl px-4 py-2.5 "
                 >
-                  <span className="text-gray-900 dark:text-white font-semibold text-sm">{u.username}</span>
+                  <span className="text-gray-900 dark:text-white font-semibold text-sm">
+                    {u.username}
+                  </span>
                   {u.email && (
-                    <span className="text-blue-600/70 dark:text-purple-300/70 text-xs">{u.email}</span>
+                    <span className="text-blue-600/70 dark:text-purple-300/70 text-xs">
+                      {u.email}
+                    </span>
                   )}
                 </div>
               ))}
@@ -123,7 +143,7 @@ function getSubmissionsByDate(submissions) {
   });
 
   const sorted = Object.entries(counts).sort(
-    (a, b) => new Date(a[0]) - new Date(b[0])
+    (a, b) => new Date(a[0]) - new Date(b[0]),
   );
 
   return {
@@ -223,14 +243,15 @@ export default function AdminDashboard() {
 
   const todayStr = new Date().toISOString().split("T")[0];
   const submissionsToday = submissions.filter(
-    (sub) => sub.dateOfSubmission === todayStr
+    (sub) => sub.dateOfSubmission === todayStr,
   ).length;
 
   const lineData = getSubmissionsByDate(submissions);
   const pieData = getGenderDistribution(submissions, theme);
 
   const axisTextColor = theme === "dark" ? "#c9b8e8" : "#5b7fa6";
-  const gridLineColor = theme === "dark" ? "rgba(255,255,255,0.08)" : "rgba(59,130,246,0.08)";
+  const gridLineColor =
+    theme === "dark" ? "rgba(255,255,255,0.08)" : "rgba(59,130,246,0.08)";
   const legendTextColor = theme === "dark" ? "#e8dcf7" : "#3a5a7a";
 
   const chartOptions = {
@@ -255,7 +276,7 @@ export default function AdminDashboard() {
 
   return (
     <div
-            className="min-h-screen w-full bg-blue-50 dark:bg-[#240b3b] px-4 sm:px-6 py-6 sm:py-8 relative overflow-hidden  text-gray-900 dark:text-white font-sans transition-colors duration-200"
+      className="min-h-screen w-full bg-blue-50 dark:bg-[#240b3b] px-4 sm:px-6 py-6 sm:py-8 relative overflow-hidden  text-gray-900 dark:text-white font-sans transition-colors duration-200"
       style={
         theme === "dark"
           ? {
@@ -281,7 +302,9 @@ export default function AdminDashboard() {
           </h1>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-purple-300/80 mt-0.5">
             Logged in as Administrator:{" "}
-            <span className="font-semibold text-base sm:text-lg text-orange-500 dark:text-orange-400">{currentUser?.username}</span>
+            <span className="font-semibold text-base sm:text-lg text-orange-500 dark:text-orange-400">
+              {currentUser?.username}
+            </span>
           </p>
         </div>
 
@@ -299,17 +322,25 @@ export default function AdminDashboard() {
           <button
             data-tour="all-submissions-btn"
             onClick={() => navigate("/admin-submissions")}
-            className="px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 dark:bg-[#1b082d]/70 dark:text-purple-200 dark:border-purple-500/40 rounded-xl font-bold text-xs sm:text-sm hover:bg-blue-100 hover:border-blue-300 dark:hover:bg-[#1b082d] transition duration-200 shadow-md"
+            className="px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 dark:bg-[#1b082d]/70 dark:text-purple-200 dark:border-purple-500/40 rounded-xl font-bold text-xs sm:text-sm hover:bg-blue-100  dark:hover:bg-[#1b082d] transition duration-200 shadow-md"
           >
             All Submissions
           </button>
           <button
             data-tour="activity-logs-btn"
             onClick={() => navigate("/activity-logs")}
-            className="px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 dark:bg-[#1b082d]/70 dark:text-purple-200 dark:border-purple-500/40 rounded-xl font-bold text-xs sm:text-sm hover:bg-blue-100 hover:border-blue-300 dark:hover:bg-[#1b082d] transition duration-200 shadow-md"
+            className="px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 dark:bg-[#1b082d]/70 dark:text-purple-200 dark:border-purple-500/40 rounded-xl font-bold text-xs sm:text-sm hover:bg-blue-100  dark:hover:bg-[#1b082d] transition duration-200 shadow-md"
           >
             Activity Logs
           </button>
+
+          <button
+            onClick={() => navigate("/admin/api-dashboard")}
+            className="px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 dark:bg-[#1b082d]/70 dark:text-purple-200 dark:border-purple-500/40 rounded-xl font-bold text-xs sm:text-sm hover:bg-blue-100  dark:hover:bg-[#1b082d] transition duration-200 shadow-md"
+          >
+            View API Dashboard
+          </button>
+
           <button
             data-tour="admin-logout-btn"
             onClick={handleLogout}
@@ -342,14 +373,24 @@ export default function AdminDashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
-        <div data-tour="chart-submissions-over-time" className="bg-white/95 dark:bg-[#2e1048]/95 backdrop-blur-md p-5 rounded-3xl shadow-2xl border border-blue-100 dark:border-purple-500/30">
-          <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3">Submissions Over Time</h3>
+        <div
+          data-tour="chart-submissions-over-time"
+          className="bg-white/95 dark:bg-[#2e1048]/95 backdrop-blur-md p-5 rounded-3xl shadow-2xl border border-blue-100 dark:border-purple-500/30"
+        >
+          <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3">
+            Submissions Over Time
+          </h3>
           <div className="relative h-56">
             <Line data={lineData} options={chartOptions} />
           </div>
         </div>
-        <div data-tour="chart-gender-distribution" className="bg-white/95 dark:bg-[#2e1048]/95 backdrop-blur-md p-5 rounded-3xl shadow-2xl border border-blue-100 dark:border-purple-500/30">
-          <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3">Gender Distribution</h3>
+        <div
+          data-tour="chart-gender-distribution"
+          className="bg-white/95 dark:bg-[#2e1048]/95 backdrop-blur-md p-5 rounded-3xl shadow-2xl border border-blue-100 dark:border-purple-500/30"
+        >
+          <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3">
+            Gender Distribution
+          </h3>
           <div className="relative h-56">
             <Pie data={pieData} options={pieOptions} />
           </div>
@@ -357,7 +398,10 @@ export default function AdminDashboard() {
       </div>
 
       {showUsersModal && (
-        <UsersModal users={nonAdminUsers} onClose={() => setShowUsersModal(false)} />
+        <UsersModal
+          users={nonAdminUsers}
+          onClose={() => setShowUsersModal(false)}
+        />
       )}
     </div>
   );

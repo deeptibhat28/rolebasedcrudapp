@@ -45,3 +45,15 @@ export const getUsers = async () => {
     const response = await axios.get(`${API_URL}/users`);
     return response.data;
 };
+
+export const getCountriesData = async () => {
+    try {
+        const response = await axios.get(
+            "https://randomuser.me/api/?results=2000"
+        );
+        return response.data.results;
+    } catch (error) {
+        console.error("Error fetching countries data:", error);
+        throw error;
+    }
+}
