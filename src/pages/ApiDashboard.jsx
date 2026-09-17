@@ -4,6 +4,7 @@ import { getCountriesData } from "../services/api";
 import { useTheme } from "../context/ThemeContext";
 import ThemeToggle from "../components/ThemeToggle";
 import WorldMap from "../components/WorldMap";
+import ExportModal from "../components/ExportModal";
 import {
   BarChart,
   Bar,
@@ -53,6 +54,8 @@ export default function ApiDashboard() {
   const [genderFilter, setGenderFilter] = useState("All");
   const [activeBarIndex, setActiveBarIndex] = useState(null);
   const [activePieIndex, setActivePieIndex] = useState(null);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [jumpToPageInput, setJumpToPageInput] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -117,7 +120,32 @@ export default function ApiDashboard() {
     : "rgba(59,130,246,0.08)";
   const legendTextColor = isDark ? "#e8dcf7" : "#3a5a7a";
 
+  const exportColumns = [
+    { key: "name", label: "Name" },
+    { key: "country", label: "Country" },
+    { key: "gender", label: "Gender" },
+    { key: "age", label: "Age" },
+    { key: "nat", label: "Nationality" },
+  ];
+
+  const exportRows = filteredUsers.map((u) => ({
+    name: u.name,
+    country: u.country,
+    gender: u.gender,
+    age: u.age,
+    nat: u.nat,
+  }));
+
+  // Pagination
   const totalPages = Math.ceil(filteredUsers.length / ROWS_PER_PAGE) || 1;
+  const handleJumpToPage = () => {
+    const pageNum = parseInt(jumpToPageInput, 10);
+    if (!pageNum || pageNum < 1 || pageNum > totalPages) {
+      return;
+    }
+    setCurrentPage(pageNum);
+    setJumpToPageInput("");
+  };
   const startIndex = (currentPage - 1) * ROWS_PER_PAGE;
   const currentRows = filteredUsers.slice(
     startIndex,
@@ -142,7 +170,6 @@ export default function ApiDashboard() {
       <div className="absolute -top-32 -left-32 w-96 h-96 bg-blue-200/20 dark:bg-purple-600/20 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-blue-300/20 dark:bg-pink-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
-      {/* Header */}
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white/95 dark:bg-[#2e1048]/95 backdrop-blur-md p-5 sm:p-6 rounded-3xl shadow-2xl mb-6 border-2 border-blue-200 dark:border-purple-500/30 relative z-10 gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white tracking-wide">
@@ -192,6 +219,12 @@ export default function ApiDashboard() {
                 <span className="px-3 py-1.5 bg-blue-50 text-blue-700 border border-blue-200 dark:bg-[#1b082d]/70 dark:text-purple-300 dark:border-purple-500/40 rounded-xl text-xs font-bold whitespace-nowrap shadow-inner">
                   Total Records: {users.length}
                 </span>
+                <button
+                  onClick={() => setShowExportModal(true)}
+                  className="px-3 py-1.5 bg-blue-50 text-blue-700 border border-blue-200 dark:bg-[#1b082d]/70 dark:text-purple-300 dark:border-purple-500/40 rounded-xl text-xs font-bold hover:bg-blue-100 dark:hover:bg-[#1b082d] transition whitespace-nowrap shadow-inner"
+                >
+                  Export Data
+                </button>
               </div>
             </div>
 
@@ -277,7 +310,7 @@ export default function ApiDashboard() {
                   {Math.min(startIndex + ROWS_PER_PAGE, filteredUsers.length)}{" "}
                   of {filteredUsers.length} entries
                 </p>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 flex-wrap gap-y-2">
                   <button
                     onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
                     disabled={currentPage === 1}
@@ -305,6 +338,30 @@ export default function ApiDashboard() {
                   >
                     Next
                   </button>
+
+                  <div className="flex items-center space-x-1.5 ml-1">
+                    <span className="text-gray-500 dark:text-purple-300/80 font-medium">
+                      Go to:
+                    </span>
+                    <input
+                      type="number"
+                      min={1}
+                      max={totalPages}
+                      value={jumpToPageInput}
+                      onChange={(e) => setJumpToPageInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleJumpToPage();
+                      }}
+                      placeholder={`1-${totalPages}`}
+                      className="w-16 px-2 py-1.5 bg-white text-gray-900 dark:bg-[#2e1048] dark:text-white rounded-xl border border-blue-200 dark:border-purple-500/40 text-center font-bold shadow-inner focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-purple-500"
+                    />
+                    <button
+                      onClick={handleJumpToPage}
+                      className="px-3 py-1.5 bg-linear-to-r from-orange-500 to-pink-600 text-white rounded-xl font-bold shadow-md hover:opacity-95 transition"
+                    >
+                      Go
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -428,6 +485,15 @@ export default function ApiDashboard() {
             </h3>
             <WorldMap countryStats={countryStats} />
           </div>
+
+          <ExportModal
+            isOpen={showExportModal}
+            onClose={() => setShowExportModal(false)}
+            columns={exportColumns}
+            rows={exportRows}
+            baseName="api_dashboard_users"
+            sheetName="Users"
+          />
         </>
       )}
     </div>

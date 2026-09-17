@@ -5,7 +5,12 @@ export const logActivity = async (actionType, details, actorName = "System") => 
     const day = String(now.getDate()).padStart(2, '0');
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const year = now.getFullYear();
-    const time = now.toLocaleTimeString(); 
+    const time = now.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true,
+    });
 
     const formattedTimestamp = `${day}/${month}/${year}, ${time}`;
 

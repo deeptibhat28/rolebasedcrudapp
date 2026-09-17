@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { logActivity } from "../utils/logger";
 import { useTheme } from "../context/ThemeContext";
 import ThemeToggle from "../components/ThemeToggle";
+import ExportModal from "../components/ExportModal";
 
 function toIsoDate(date) {
   const y = date.getFullYear();
@@ -60,7 +61,9 @@ function DateRangePicker({ fromDate, toDate, onApply }) {
   };
 
   const changeMonth = (delta) => {
-    setViewDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + delta, 1));
+    setViewDate(
+      (prev) => new Date(prev.getFullYear(), prev.getMonth() + delta, 1),
+    );
   };
 
   const year = viewDate.getFullYear();
@@ -75,7 +78,11 @@ function DateRangePicker({ fromDate, toDate, onApply }) {
     cells.push({ day: daysInPrevMonth - startWeekday + 1 + i, current: false });
   }
   for (let d = 1; d <= daysInMonth; d++) {
-    cells.push({ day: d, current: true, dateStr: toIsoDate(new Date(year, month, d)) });
+    cells.push({
+      day: d,
+      current: true,
+      dateStr: toIsoDate(new Date(year, month, d)),
+    });
   }
   while (cells.length % 7 !== 0) {
     const overflowDay = cells.length - startWeekday - daysInMonth + 1;
@@ -86,8 +93,8 @@ function DateRangePicker({ fromDate, toDate, onApply }) {
     fromDate && toDate
       ? `${formatShortDate(fromDate)} \u2013 ${formatShortDate(toDate)}`
       : fromDate
-      ? `${formatShortDate(fromDate)} \u2013 ...`
-      : "Date range";
+        ? `${formatShortDate(fromDate)} \u2013 ...`
+        : "Date range";
 
   return (
     <div className="relative">
@@ -122,7 +129,10 @@ function DateRangePicker({ fromDate, toDate, onApply }) {
                 &#8249;
               </button>
               <span className="text-xs font-bold text-gray-900 dark:text-white">
-                {viewDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                {viewDate.toLocaleDateString("en-US", {
+                  month: "long",
+                  year: "numeric",
+                })}
               </span>
               <button
                 onClick={() => changeMonth(1)}
@@ -143,7 +153,10 @@ function DateRangePicker({ fromDate, toDate, onApply }) {
               {cells.map((cell, idx) => {
                 if (!cell.current) {
                   return (
-                    <span key={idx} className="py-1.5 text-blue-200 dark:text-purple-600/30">
+                    <span
+                      key={idx}
+                      className="py-1.5 text-blue-200 dark:text-purple-600/30"
+                    >
                       {cell.day}
                     </span>
                   );
@@ -151,7 +164,10 @@ function DateRangePicker({ fromDate, toDate, onApply }) {
                 const isFrom = cell.dateStr === tempFrom;
                 const isTo = cell.dateStr === tempTo;
                 const inRange =
-                  tempFrom && tempTo && cell.dateStr > tempFrom && cell.dateStr < tempTo;
+                  tempFrom &&
+                  tempTo &&
+                  cell.dateStr > tempFrom &&
+                  cell.dateStr < tempTo;
                 return (
                   <button
                     key={idx}
@@ -160,8 +176,8 @@ function DateRangePicker({ fromDate, toDate, onApply }) {
                       isFrom || isTo
                         ? "bg-linear-to-r from-orange-500 to-pink-600 text-white font-bold"
                         : inRange
-                        ? "bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-200"
-                        : "text-gray-700 hover:bg-blue-50 dark:text-purple-100 dark:hover:bg-purple-800/40"
+                          ? "bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-200"
+                          : "text-gray-700 hover:bg-blue-50 dark:text-purple-100 dark:hover:bg-purple-800/40"
                     }`}
                   >
                     {cell.day}
@@ -208,6 +224,7 @@ export default function AdminSubmissions() {
   const [genderFilter, setGenderFilter] = useState("All");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+  const [showExportModal, setShowExportModal] = useState(false);
 
   const dateFilter = searchParams.get("date");
   const todayStr = new Date().toISOString().split("T")[0];
@@ -241,9 +258,9 @@ export default function AdminSubmissions() {
   const confirmDelete = async () => {
     try {
       const targetSub = submissions.find(
-        (sub) => String(sub.id || sub._id) === String(deleteId)
+        (sub) => String(sub.id || sub._id) === String(deleteId),
       );
-      const actualId = targetSub ? (targetSub.id || targetSub._id) : deleteId;
+      const actualId = targetSub ? targetSub.id || targetSub._id : deleteId;
       const subName = targetSub ? targetSub.fullName : `ID: ${actualId}`;
 
       await deleteSubmission(actualId);
@@ -251,11 +268,11 @@ export default function AdminSubmissions() {
       logActivity(
         "FORM_DELETE",
         `Deleted form submission for: ${subName}`,
-        currentUser?.username || "Admin"
+        currentUser?.username || "Admin",
       );
 
       setSubmissions((prev) =>
-        prev.filter((sub) => String(sub.id || sub._id) !== String(actualId))
+        prev.filter((sub) => String(sub.id || sub._id) !== String(actualId)),
       );
 
       toast.success("Submission deleted successfully.");
@@ -290,12 +307,16 @@ export default function AdminSubmissions() {
   };
 
   const submittedByOptions = useMemo(() => {
-    const unique = [...new Set(submissions.map((sub) => sub.username).filter(Boolean))];
+    const unique = [
+      ...new Set(submissions.map((sub) => sub.username).filter(Boolean)),
+    ];
     return unique.sort();
   }, [submissions]);
 
   const genderOptions = useMemo(() => {
-    const unique = [...new Set(submissions.map((sub) => sub.gender).filter(Boolean))];
+    const unique = [
+      ...new Set(submissions.map((sub) => sub.gender).filter(Boolean)),
+    ];
     return unique.sort();
   }, [submissions]);
 
@@ -343,13 +364,34 @@ export default function AdminSubmissions() {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentSubmissions = filteredSubmissions.slice(indexOfFirstItem, indexOfLastItem);
+  const currentSubmissions = filteredSubmissions.slice(
+    indexOfFirstItem,
+    indexOfLastItem,
+  );
   const totalPages = Math.ceil(filteredSubmissions.length / itemsPerPage);
 
   const formatDate = (isoDate) => {
     if (!isoDate) return "N/A";
     return isoDate.split("-").reverse().join("/");
   };
+
+  const exportColumns = [
+    { key: "username", label: "Submitted By" },
+    { key: "fullName", label: "Full Name" },
+    { key: "email", label: "Email" },
+    { key: "phone", label: "Phone" },
+    { key: "gender", label: "Gender" },
+    { key: "submittedDate", label: "Submitted Date" },
+  ];
+
+  const exportRows = filteredSubmissions.map((sub) => ({
+    username: sub.username || "Unknown User",
+    fullName: sub.fullName || "",
+    email: sub.email || "",
+    phone: sub.phone || "N/A",
+    gender: sub.gender || "N/A",
+    submittedDate: formatDate(sub.dateOfSubmission),
+  }));
 
   return (
     <div
@@ -369,7 +411,7 @@ export default function AdminSubmissions() {
       <div className="absolute -top-32 -left-32 w-96 h-96 bg-blue-200/20 dark:bg-purple-600/20 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-blue-300/20 dark:bg-pink-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
-       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white/95 dark:bg-[#2e1048]/95 backdrop-blur-md p-5 sm:p-6 rounded-3xl shadow-2xl mb-6 border-2 border-blue-200 dark:border-purple-500/30 relative z-10 gap-4">
+      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white/95 dark:bg-[#2e1048]/95 backdrop-blur-md p-5 sm:p-6 rounded-3xl shadow-2xl mb-6 border-2 border-blue-200 dark:border-purple-500/30 relative z-10 gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white tracking-wide">
             User Submission Form Details
@@ -398,8 +440,12 @@ export default function AdminSubmissions() {
       <div className="max-w-7xl mx-auto bg-white/95 dark:bg-[#2e1048]/95 backdrop-blur-md p-4 sm:p-6 rounded-3xl shadow-2xl border border-blue-100 dark:border-purple-500/30 relative z-10">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <div>
-            <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">All User Submissions</h2>
-            <p className="text-xs text-gray-500 dark:text-purple-300/80">Manage and search user form entries</p>
+            <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
+              All User Submissions
+            </h2>
+            <p className="text-xs text-gray-500 dark:text-purple-300/80">
+              Manage and search user form entries
+            </p>
           </div>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
@@ -420,6 +466,12 @@ export default function AdminSubmissions() {
               Total: {filteredSubmissions.length}
             </span>
 
+            <button
+              onClick={() => setShowExportModal(true)}
+              className="px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 dark:bg-[#1b082d]/70 dark:text-purple-300 dark:border-purple-500/40 rounded-xl text-xs font-bold hover:bg-blue-100 dark:hover:bg-[#1b082d] transition whitespace-nowrap shadow-inner"
+            >
+              Export Data
+            </button>
           </div>
         </div>
 
@@ -512,22 +564,35 @@ export default function AdminSubmissions() {
                   {currentSubmissions.map((sub) => {
                     const recordId = sub.id || sub._id;
                     return (
-                      <tr key={recordId} className="hover:bg-blue-50/60 dark:hover:bg-purple-900/20 transition">
+                      <tr
+                        key={recordId}
+                        className="hover:bg-blue-50/60 dark:hover:bg-purple-900/20 transition"
+                      >
                         <td className="py-3 px-2">
                           <span className="px-2.5 py-1 bg-linear-to-r from-orange-500 to-pink-600 text-white rounded-lg text-xs font-bold shadow-sm">
                             {sub.username || "Unknown User"}
                           </span>
                         </td>
-                        <td className="py-3 px-2 font-bold text-gray-900 dark:text-white">{sub.fullName}</td>
-                        <td className="py-3 px-2 text-xs text-gray-500 dark:text-purple-300/80 truncate max-w-xs">{sub.email}</td>
-                        <td className="py-3 px-2 text-xs font-medium">{sub.phone || "N/A"}</td>
-                        <td className="py-3 px-2 font-medium">{sub.gender || "N/A"}</td>
+                        <td className="py-3 px-2 font-bold text-gray-900 dark:text-white">
+                          {sub.fullName}
+                        </td>
+                        <td className="py-3 px-2 text-xs text-gray-500 dark:text-purple-300/80 truncate max-w-xs">
+                          {sub.email}
+                        </td>
+                        <td className="py-3 px-2 text-xs font-medium">
+                          {sub.phone || "N/A"}
+                        </td>
+                        <td className="py-3 px-2 font-medium">
+                          {sub.gender || "N/A"}
+                        </td>
                         <td className="py-3 px-2 text-xs text-gray-500 dark:text-purple-300/80 whitespace-nowrap">
                           {formatDate(sub.dateOfSubmission)}
                         </td>
                         <td className="py-3 px-2 text-right space-x-2 whitespace-nowrap">
                           <button
-                            onClick={() => navigate(`/admin/form-details/${recordId}`)}
+                            onClick={() =>
+                              navigate(`/admin/form-details/${recordId}`)
+                            }
                             className="px-3 py-1 bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-500/30 rounded-xl text-xs font-bold hover:bg-blue-100 dark:hover:bg-blue-500/30 transition"
                           >
                             View
@@ -550,27 +615,48 @@ export default function AdminSubmissions() {
               {currentSubmissions.map((sub) => {
                 const recordId = sub.id || sub._id;
                 return (
-                  <div key={recordId} className="p-4 rounded-2xl bg-blue-50/60 dark:bg-[#1b082d]/70 border border-blue-100 dark:border-purple-500/40 shadow-inner space-y-2">
+                  <div
+                    key={recordId}
+                    className="p-4 rounded-2xl bg-blue-50/60 dark:bg-[#1b082d]/70 border border-blue-100 dark:border-purple-500/40 shadow-inner space-y-2"
+                  >
                     <div className="flex items-center justify-between">
                       <span className="px-2.5 py-1 bg-linear-to-r from-orange-500 to-pink-600 text-white rounded-lg text-xs font-bold shadow-sm">
                         {sub.username || "Unknown User"}
                       </span>
-                      <span className="text-xs text-gray-500 dark:text-purple-300/80">{formatDate(sub.dateOfSubmission)}</span>
+                      <span className="text-xs text-gray-500 dark:text-purple-300/80">
+                        {formatDate(sub.dateOfSubmission)}
+                      </span>
                     </div>
 
                     <div>
-                      <h3 className="font-bold text-gray-900 dark:text-white text-sm">{sub.fullName}</h3>
-                      <p className="text-xs text-gray-500 dark:text-purple-300/80 truncate">{sub.email || "N/A"}</p>
+                      <h3 className="font-bold text-gray-900 dark:text-white text-sm">
+                        {sub.fullName}
+                      </h3>
+                      <p className="text-xs text-gray-500 dark:text-purple-300/80 truncate">
+                        {sub.email || "N/A"}
+                      </p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 dark:text-purple-200 pt-1 border-t border-blue-100 dark:border-purple-500/20">
-                      <div><span className="text-blue-500 dark:text-purple-400">Phone:</span> {sub.phone || "N/A"}</div>
-                      <div><span className="text-blue-500 dark:text-purple-400">Gender:</span> {sub.gender || "N/A"}</div>
+                      <div>
+                        <span className="text-blue-500 dark:text-purple-400">
+                          Phone:
+                        </span>{" "}
+                        {sub.phone || "N/A"}
+                      </div>
+                      <div>
+                        <span className="text-blue-500 dark:text-purple-400">
+                          Gender:
+                        </span>{" "}
+                        {sub.gender || "N/A"}
+                      </div>
                     </div>
 
                     <div className="flex justify-end space-x-2 pt-2">
                       <button
-                        onClick={() => navigate(`/admin/form-details/${recordId}`)}
+                        onClick={() =>
+                          navigate(`/admin/form-details/${recordId}`)
+                        }
                         className="px-3 py-1 bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-500/30 rounded-xl text-xs font-bold hover:bg-blue-100 dark:hover:bg-blue-500/30"
                       >
                         View
@@ -593,8 +679,9 @@ export default function AdminSubmissions() {
       {filteredSubmissions.length > itemsPerPage && (
         <div className="max-w-7xl mx-auto mt-4 px-2 flex flex-col sm:flex-row justify-between items-center text-gray-900 dark:text-white relative z-10 gap-3">
           <p className="text-xs text-gray-500 dark:text-purple-300/80 text-center sm:text-left">
-            Showing {filteredSubmissions.length > 0 ? indexOfFirstItem + 1 : 0} to{" "}
-            {Math.min(indexOfLastItem, filteredSubmissions.length)} of {filteredSubmissions.length} entries
+            Showing {filteredSubmissions.length > 0 ? indexOfFirstItem + 1 : 0}{" "}
+            to {Math.min(indexOfLastItem, filteredSubmissions.length)} of{" "}
+            {filteredSubmissions.length} entries
           </p>
 
           <div className="flex items-center space-x-2">
@@ -611,7 +698,9 @@ export default function AdminSubmissions() {
             </span>
 
             <button
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
               disabled={currentPage === totalPages || totalPages === 0}
               className="px-3 py-1.5 bg-white text-blue-700 border border-blue-200 dark:bg-[#2e1048] dark:text-purple-200 dark:border-purple-500/40 rounded-xl text-xs font-bold hover:bg-blue-50 dark:hover:bg-[#1b082d] transition disabled:opacity-40 disabled:cursor-not-allowed shadow-md"
             >
@@ -625,9 +714,12 @@ export default function AdminSubmissions() {
         ReactDOM.createPortal(
           <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-xs z-50 px-4">
             <div className="bg-white dark:bg-[#2e1048] p-6 rounded-3xl shadow-2xl max-w-sm w-full border border-blue-200 dark:border-purple-500/40 text-center text-gray-900 dark:text-white">
-              <h3 className="text-lg font-extrabold text-gray-900 dark:text-white mb-2">Are you sure?</h3>
+              <h3 className="text-lg font-extrabold text-gray-900 dark:text-white mb-2">
+                Are you sure?
+              </h3>
               <p className="text-xs text-gray-500 dark:text-purple-300/80 mb-6">
-                Do you really want to delete this submission? This action cannot be undone.
+                Do you really want to delete this submission? This action cannot
+                be undone.
               </p>
               <div className="flex justify-center space-x-3">
                 <button
@@ -645,8 +737,17 @@ export default function AdminSubmissions() {
               </div>
             </div>
           </div>,
-          document.body
+          document.body,
         )}
+
+      <ExportModal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        columns={exportColumns}
+        rows={exportRows}
+        baseName="user_submissions"
+        sheetName="Submissions"
+      />
     </div>
   );
 }
