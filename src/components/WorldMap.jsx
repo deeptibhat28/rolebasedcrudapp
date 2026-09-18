@@ -10,7 +10,7 @@ const GENDER_COLORS = {
   other: "#7f77dd",
 };
 
-function WorldMap({ countryStats }) {
+function WorldMap({ countryStats, selectedCountry, onCountrySelect }) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const [tooltip, setTooltip] = useState(null);
@@ -45,10 +45,14 @@ function WorldMap({ countryStats }) {
               const stats = countryStats[name];
               const isHighlighted = !!stats;
               const isHovered = hoveredName === name;
+              const isSelected = selectedCountry === name;
 
               let fill = isHighlighted ? highlightFill : baseFill;
               if (isHovered) {
                 fill = isHighlighted ? highlightHover : baseHover;
+              }
+              if (isSelected) {
+                fill = isDark ? "#ffd479" : "#f59e0b";
               }
 
               return (
@@ -56,8 +60,12 @@ function WorldMap({ countryStats }) {
                   key={geo.rsmKey}
                   geography={geo}
                   fill={fill}
-                  stroke={strokeColor}
-                  strokeWidth={0.5}
+                  stroke={isSelected ? (isDark ? "#ffe8b0" : "#b45309") : strokeColor}
+                  strokeWidth={isSelected ? 1.6 : 0.5}
+                  onClick={() => {
+                    if (!isHighlighted) return;
+                    onCountrySelect?.(isSelected ? null : name);
+                  }}
                   onMouseEnter={(evt) => {
                     setHoveredName(name);
                     setTooltip({
@@ -78,7 +86,7 @@ function WorldMap({ countryStats }) {
                   }}
                   style={{
                     default: { outline: "none" },
-                    hover: { outline: "none", cursor: "pointer" },
+                    hover: { outline: "none", cursor: isHighlighted ? "pointer" : "default" },
                     pressed: { outline: "none" },
                   }}
                 />

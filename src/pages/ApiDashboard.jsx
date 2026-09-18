@@ -52,6 +52,7 @@ export default function ApiDashboard() {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [genderFilter, setGenderFilter] = useState("All");
+  const [selectedCountry, setSelectedCountry] = useState(null);
   const [activeBarIndex, setActiveBarIndex] = useState(null);
   const [activePieIndex, setActivePieIndex] = useState(null);
   const [showExportModal, setShowExportModal] = useState(false);
@@ -83,10 +84,12 @@ export default function ApiDashboard() {
   const genderOptions = [
     ...new Set(users.map((u) => u.gender).filter(Boolean)),
   ];
-  const filteredUsers =
-    genderFilter === "All"
-      ? users
-      : users.filter((u) => u.gender === genderFilter);
+  const filteredUsers = users.filter ((u) => {
+    const matchesGender = genderFilter === "All" || u.gender === genderFilter;
+    const matchesCountry = !selectedCountry || u.country === selectedCountry;
+    return matchesGender && matchesCountry;
+  })
+    
 
   // Charts + map always reflect the FULL dataset
   const countryStats = users.reduce((acc, u) => {
@@ -246,7 +249,7 @@ export default function ApiDashboard() {
                 ))}
               </select>
 
-              {genderFilter !== "All" && (
+                            {genderFilter !== "All" && (
                 <button
                   onClick={() => {
                     setGenderFilter("All");
@@ -256,6 +259,22 @@ export default function ApiDashboard() {
                 >
                   Reset Filter
                 </button>
+              )}
+
+              {selectedCountry && (
+                <span className="flex items-center gap-2 px-3 py-2 bg-orange-50 text-orange-700 border border-orange-200 dark:bg-orange-500/20 dark:text-orange-300 dark:border-orange-500/30 rounded-xl text-xs font-bold whitespace-nowrap">
+                  Filtering by: {selectedCountry}
+                  <button
+                    onClick={() => {
+                      setSelectedCountry(null);
+                      setCurrentPage(1);
+                    }}
+                    className="text-orange-500 dark:text-orange-300 hover:text-orange-800 dark:hover:text-white leading-none"
+                    aria-label="Clear country filter"
+                  >
+                    &times;
+                  </button>
+                </span>
               )}
             </div>
 
@@ -483,7 +502,14 @@ export default function ApiDashboard() {
             <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3">
               Countries Represented in Data
             </h3>
-            <WorldMap countryStats={countryStats} />
+            <WorldMap 
+            countryStats={countryStats}
+            selectedCountry={selectedCountry}
+            onCountrySelect={(country) => {
+              setSelectedCountry(country);
+              setCurrentPage(1);
+            }} 
+            />
           </div>
 
           <ExportModal
